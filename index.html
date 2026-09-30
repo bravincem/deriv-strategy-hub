@@ -42,8 +42,8 @@ label{display:block;font-size:12px;color:#7f91a7;font-weight:800;margin-bottom:6
 <header class="top">
   <div class="brand"><div class="brandDot">●●●</div><span>DERIV STRATEGY HUB</span></div>
   <div class="spacer"></div>
-  <a class="btn" id="loginBtn" href="https://deriv-strategy-api.bravincem.workers.dev/auth/start" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center">Log In</a>
-  <button class="btn secondary" id="tokenBtn" type="button" onclick="document.getElementById('modal').classList.add('show')">API Token</button>
+  <a class="btn" id="loginBtn" href="https://home.deriv.com/dashboard/login" target="_blank" rel="noopener" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center">OPEN DERIV</a>
+  <a class="btn secondary" id="tokenBtn" href="https://home.deriv.com/dashboard/login" target="_blank" rel="noopener" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center">DERIV TRADER</a>
 </header>
 
 <nav class="nav" id="nav">
@@ -66,7 +66,7 @@ label{display:block;font-size:12px;color:#7f91a7;font-weight:800;margin-bottom:6
 
 <section id="dashboard" class="view active">
   <div class="hero"><h1 id="greeting">Good morning</h1><p>"The only limit to our realization of tomorrow will be our doubts of today."</p></div>
-  <div class="sectionTitle"><h2>QUICK ACTIONS</h2><span class="pill" id="connPill">NOT CONNECTED</span></div>
+  <div class="sectionTitle"><h2>QUICK ACTIONS</h2><span class="pill" id="connPill">DERIV DIRECT</span></div>
       <div id="connectionDiag" class="notice" style="margin:10px 0;display:none;white-space:pre-wrap;word-break:break-word"></div>
   <div class="grid">
     <div class="card"><div class="icon">♛</div><h3>Premium Bots</h3><p>Explore strategy templates and load them into the builder.</p><div class="link" data-go="free">Explore bots ↗</div></div>
@@ -75,14 +75,14 @@ label{display:block;font-size:12px;color:#7f91a7;font-weight:800;margin-bottom:6
     <div class="card"><div class="icon">⌘</div><h3>Quick Bot Builder</h3><p>Create a one-tick bot with stake, take-profit, stop-loss and recovery controls.</p><div class="link" data-go="quick">Create bot ↗</div></div>
   </div>
   <div class="darkPanel" style="margin-top:18px">
-    <div class="sectionTitle"><h2>LIVE ACCOUNT</h2><span class="status" id="accountStatus">Not connected</span></div>
+    <div class="sectionTitle"><h2>DERIV DIRECT</h2><span class="status" id="accountStatus">Open Deriv in the official trading platform</span></div>
     <div class="metric">
       <div class="metricBox"><small>Account</small><b id="accountId">—</b></div>
       <div class="metricBox"><small>Balance</small><b id="balance">—</b></div>
       <div class="metricBox"><small>Market</small><b id="marketName">Volatility 100</b></div>
       <div class="metricBox"><small>Last Digit</small><b id="lastDigit">—</b></div>
     </div>
-    <div class="notice" id="feedStatus">Public market feed starting…</div>
+    <div class="notice ok" id="feedStatus">Live public market data is connected directly to Deriv. Account login is handled by Deriv itself.</div><a class="btn" href="https://home.deriv.com/dashboard/login" target="_blank" rel="noopener" style="display:inline-flex;text-decoration:none;margin-top:12px">OPEN DERIV ACCOUNT ↗</a>
   </div>
 </section>
 
@@ -201,29 +201,18 @@ label{display:block;font-size:12px;color:#7f91a7;font-weight:800;margin-bottom:6
 
 <div class="bottom"><button class="runBtn" id="bottomRun">▶ Run</button><div class="bottomStatus" id="bottomStatus">Bot is not running</div><div class="bottomRight">Open transaction</div></div>
 
-<div class="modal" id="modal"><div class="modalBox"><button class="close" id="closeModal" type="button" onclick="document.getElementById('modal').classList.remove('show')">×</button><h2 id="modalTitle">Connect DEMO Account</h2><p class="status">Use a DEMO API token. The token is used only in this browser session and is not saved to the site or sent to our server.</p><input class="field" id="manualToken" type="password" autocomplete="off" placeholder="Paste DEMO API token"><button class="btn green" style="margin-top:12px;width:100%" id="manualConnect">Connect DEMO</button><button class="btn secondary" style="margin-top:10px;width:100%" id="oauthConnect">Use Deriv Login instead</button><div class="notice" style="margin-top:12px">Never paste a client secret, password or OTP here.</div></div></div>
+<div class="modal" id="modal"><div class="modalBox"><button class="close" id="closeModal" type="button" onclick="document.getElementById('modal').classList.remove('show')">×</button><h2>Deriv Direct</h2><p class="status">This Hub no longer uses the broken third-party connection screen. Open Deriv directly in a separate tab and keep this Hub open for market analysis and strategy tools.</p><a class="btn green" href="https://home.deriv.com/dashboard/login" target="_blank" rel="noopener" style="display:flex;text-decoration:none;justify-content:center">OPEN DERIV</a><div class="notice" style="margin-top:12px">Your Deriv password, OTP and account credentials stay on Deriv.</div></div></div>
 
-<script>
-/* CONNECTION BOOTSTRAP: capture OAuth session before the Hub app starts. */
-(function(){
-  try{
-    const p=new URLSearchParams(location.search);
-    const s=p.get("session")||p.get("sid")||p.get("session_id")||"";
-    if(s){localStorage.setItem("deriv_strategy_session",s);window.__DERIV_OAUTH_SESSION__=s;}
-  }catch(e){}
-})();
-</script>
 <script>
 (() => {
 "use strict";
 
-const API_BASE = "https://deriv-strategy-api.bravincem.workers.dev";
 const PUBLIC_WS = "wss://api.derivws.com/trading/v1/options/ws/public";
 const OLD_WS = "wss://ws.binaryws.com/websockets/v3?app_id=1089";
 
 const $ = id => document.getElementById(id);
 const state = {
-  ws:null, authWs:null, accounts:[], account:null, balance:null, connected:false, sessionId:localStorage.getItem("deriv_strategy_session")||"",
+  ws:null, authWs:null, accounts:[], account:null, balance:null, connected:false, sessionId:"",
   market:"1HZ100V", quote:null, digits:[], prices:[], botRunning:false, botTimer:null,
   bot:{trades:0,wins:0,losses:0,pl:0,nextStake:1,lossStep:0},
   np:{trades:0,wins:0,losses:0,pl:0}, lastProposal:null
@@ -325,16 +314,12 @@ function setMarket(s){
 $("market").addEventListener("change",e=>setMarket(e.target.value));
 $("qMarket").addEventListener("change",e=>setMarket(e.target.value));
 
-async function oauthLogin(){
-  window.location.href=API_BASE+"/auth/start";
-}
-// OAuth login uses the Deriv OAuth worker. The API Token option remains available as a fallback.
+async function oauthLogin(){ window.open("https://home.deriv.com/dashboard/login","_blank","noopener"); }
 $("loginBtn").onclick=oauthLogin;
-$("copyDemo").onclick=showModal;
+$("copyDemo").onclick=()=>window.open("https://home.deriv.com/dashboard/login","_blank","noopener");
 
 function showModal(){ $("modal").classList.add("show"); }
-$("tokenBtn").onclick=showModal;
-$("oauthConnect").onclick=oauthLogin;
+$("tokenBtn").onclick=oauthLogin;
 $("closeModal").onclick=()=>$("modal").classList.remove("show");
 
 async function connectManualToken(token){
@@ -522,12 +507,7 @@ async function retrySavedSession(){
   await handleOAuthReturn();
   startSessionRecovery();
 }
-function startSessionRecovery(){
-  if(sessionRetryTimer)clearInterval(sessionRetryTimer);
-  sessionRetryTimer=setInterval(()=>{
-    if(!state.connected && (localStorage.getItem("deriv_strategy_session")||state.sessionId)) retrySavedSession();
-  },5000);
-}
+function startSessionRecovery(){ if(sessionRetryTimer)clearInterval(sessionRetryTimer); sessionRetryTimer=null; }
 
 async function refreshBalance(){
   if(!state.account)return;
@@ -750,37 +730,13 @@ async function historicalBacktest(){
 $("historicalBtn").onclick=historicalBacktest;
 async function init(){
   $("greeting").textContent="Good "+(new Date().getHours()<12?"morning":new Date().getHours()<18?"afternoon":"evening");
-  const qp=new URLSearchParams(location.search);
-  const returning=qp.get("deriv_connected")==="1" || qp.get("deriv_connected")==="true" || qp.has("session");
-  if(returning){
-    const d=$("connectionDiag");
-    if(d){
-      d.style.display="block";
-      d.className="notice warn";
-      d.textContent="Deriv authorization returned. Connecting your DEMO account…";
-    }
-  }
-  $("accountStatus").textContent="Checking connection…";
-
-  // Authentication must run first so a harmless market/chart error cannot
-  // prevent the OAuth callback from completing.
-  try{ await handleOAuthReturn(); }
-  catch(e){
-    setConn(false);
-    const d=$("connectionDiag");
-    if(d){
-      d.style.display="block";
-      d.className="notice warn";
-      d.textContent="CONNECTION STARTUP ERROR\n"+(e.message||String(e));
-    }
-    log("Connection startup error: "+(e.message||e));
-  }
-
+  $("connPill").textContent="DERIV DIRECT";
+  $("accountStatus").textContent="Open Deriv in the official trading platform";
+  $("feedStatus").textContent="Live public market data is connected directly to Deriv. Account login is handled by Deriv itself.";
   try{ connectPublic(); }catch(e){ log("Public market feed error: "+(e.message||e)); }
   try{ renderDistribution(); }catch(e){}
   try{ renderAnalysis(); }catch(e){}
   try{ drawChart(); }catch(e){}
-  startSessionRecovery();
 }
 window.addEventListener("resize",drawChart);
 init();
