@@ -436,9 +436,9 @@ if($("manualConnect"))$("manualConnect").onclick=()=>connectManualToken($("manua
 async function handleOAuthReturn(){
   const p=new URLSearchParams(window.location.search);
   const returned=window.__DERIV_OAUTH_SESSION__ || p.get("session") || p.get("sid") || p.get("session_id") || "";
-  const workerConnected = p.get("deriv_connected") === "1" || p.get("deriv_connected") === "true";
+  const workerConnected = p.has("deriv_connected") || p.has("connected") || p.has("oauth_success");
   const saved=localStorage.getItem("deriv_strategy_session") || "";
-  const sessionId=returned || saved;
+  const sessionId=returned || saved || p.get("token") || p.get("access_token") || "";
   const diag=$("connectionDiag");
   const showDiag=(msg,ok=false)=>{
     if(!diag)return;
@@ -454,7 +454,7 @@ async function handleOAuthReturn(){
   }else if(saved){
     showDiag("STEP 1/4  Saved Deriv session found: "+mask(saved));
   }else if(workerConnected){
-    showDiag("STEP 1/4  Deriv login completed. Checking the authorized account…");
+    showDiag("STEP 1/4  Deriv login completed. Checking the authorized account…\nCallback parameters received.");
     log("Deriv login completed. Checking your DEMO account…");
   }else{
     setConn(false);
