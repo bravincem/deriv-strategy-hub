@@ -428,6 +428,7 @@ $("manualConnect").onclick=()=>connectManualToken($("manualToken").value.trim())
 async function handleOAuthReturn(){
   const p=new URLSearchParams(window.location.search);
   const returned=window.__DERIV_OAUTH_SESSION__ || p.get("session") || p.get("sid") || p.get("session_id") || "";
+  const workerConnected = p.get("deriv_connected") === "1" || p.get("deriv_connected") === "true";
   const saved=localStorage.getItem("deriv_strategy_session") || "";
   const sessionId=returned || saved;
   const diag=$("connectionDiag");
@@ -444,6 +445,12 @@ async function handleOAuthReturn(){
     showDiag("STEP 1/4  OAuth session received: "+mask(returned));
   }else if(saved){
     showDiag("STEP 1/4  Saved Deriv session found: "+mask(saved));
+  }else if(workerConnected){
+    // OAuth worker completed the login and returned without exposing the
+    // access token to the browser. Continue using the worker's authenticated
+    // session cookie when calling its account endpoint.
+    showDiag("STEP 1/4  Deriv login completed. Checking the authorized account…");
+    log("Deriv login completed. Checking your DEMO account…");
   }else{
     setConn(false);
     showDiag("STEP 1/4  No Deriv session was received. Click Log In.");
@@ -454,12 +461,14 @@ async function handleOAuthReturn(){
   showDiag("STEP 2/4  Session saved. Contacting the Deriv account service…");
   log("Deriv session received. Checking DEMO account…");
 
-  const attempts=[
-    {name:"Bearer",headers:{"Authorization":"Bearer "+sessionId,"Content-Type":"application/json"}},
-    {name:"X-Deriv-Session",headers:{"X-Deriv-Session":sessionId,"Content-Type":"application/json"}},
-    {name:"X-Session-ID",headers:{"X-Session-ID":sessionId,"Content-Type":"application/json"}},
-    {name:"Cookie/session",headers:{"Content-Type":"application/json"}}
-  ];
+  const attempts = workerConnected && !sessionId
+    ? [{name:"OAuth worker session cookie",headers:{"Content-Type":"application/json"}}]
+    : [
+      {name:"Bearer",headers:{"Authorization":"Bearer "+sessionId,"Content-Type":"application/json"}},
+      {name:"X-Deriv-Session",headers:{"X-Deriv-Session":sessionId,"Content-Type":"application/json"}},
+      {name:"X-Session-ID",headers:{"X-Session-ID":sessionId,"Content-Type":"application/json"}},
+      {name:"Cookie/session",headers:{"Content-Type":"application/json"}}
+    ];
   let lastError="No response";
   let lastHttp="";
   for(const attempt of attempts){
