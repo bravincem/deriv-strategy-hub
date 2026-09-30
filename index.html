@@ -461,20 +461,24 @@ async function handleOAuthReturn(){
   showDiag("STEP 2/4  Session saved. Contacting the Deriv account service…");
   log("Deriv session received. Checking DEMO account…");
 
-  const attempts = workerConnected && !sessionId
-    ? [{name:"OAuth worker session cookie",headers:{"Content-Type":"application/json"}}]
+  const attempts = workerConnected
+    ? [{
+        name: "OAuth worker session",
+        headers: {"Content-Type":"application/json"},
+        url: API_BASE+"/api/accounts?session="+encodeURIComponent(sessionId||"")
+      }]
     : [
-      {name:"Bearer",headers:{"Authorization":"Bearer "+sessionId,"Content-Type":"application/json"}},
-      {name:"X-Deriv-Session",headers:{"X-Deriv-Session":sessionId,"Content-Type":"application/json"}},
-      {name:"X-Session-ID",headers:{"X-Session-ID":sessionId,"Content-Type":"application/json"}},
-      {name:"Cookie/session",headers:{"Content-Type":"application/json"}}
+      {name:"Bearer",headers:{"Authorization":"Bearer "+sessionId,"Content-Type":"application/json"},url:API_BASE+"/api/accounts"},
+      {name:"X-Deriv-Session",headers:{"X-Deriv-Session":sessionId,"Content-Type":"application/json"},url:API_BASE+"/api/accounts"},
+      {name:"X-Session-ID",headers:{"X-Session-ID":sessionId,"Content-Type":"application/json"},url:API_BASE+"/api/accounts"},
+      {name:"Cookie/session",headers:{"Content-Type":"application/json"},url:API_BASE+"/api/accounts"}
     ];
   let lastError="No response";
   let lastHttp="";
   for(const attempt of attempts){
     try{
       showDiag("STEP 3/4  Trying account service…\nMethod: "+attempt.name);
-      const r=await fetch(API_BASE+"/api/accounts",{method:"GET",headers:attempt.headers,credentials:"include",cache:"no-store"});
+      const r=await fetch(attempt.url,{method:"GET",headers:attempt.headers,credentials:"include",cache:"no-store"});
       const raw=await r.text();
       lastHttp=String(r.status);
       let d;
