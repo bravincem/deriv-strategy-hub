@@ -445,9 +445,6 @@ async function handleOAuthReturn(){
   }else if(saved){
     showDiag("STEP 1/4  Saved Deriv session found: "+mask(saved));
   }else if(workerConnected){
-    // OAuth worker completed the login and returned without exposing the
-    // access token to the browser. Continue using the worker's authenticated
-    // session cookie when calling its account endpoint.
     showDiag("STEP 1/4  Deriv login completed. Checking the authorized account…");
     log("Deriv login completed. Checking your DEMO account…");
   }else{
@@ -456,22 +453,19 @@ async function handleOAuthReturn(){
     log("Not connected. Click Log In to connect your DEMO account.");
     return false;
   }
+
   state.sessionId=sessionId;
   showDiag("STEP 2/4  Session saved. Contacting the Deriv account service…");
   log("Deriv session received. Checking DEMO account…");
 
-  const attempts = workerConnected
-    ? [
-      {name:"OAuth worker query session",headers:{"Content-Type":"application/json"},url:API_BASE+"/api/accounts?session="+encodeURIComponent(sessionId||"")},
-      {name:"OAuth worker X-Session-ID",headers:{"X-Session-ID":sessionId,"Content-Type":"application/json"},url:API_BASE+"/api/accounts"},
-      {name:"OAuth worker cookie",headers:{"Content-Type":"application/json"},url:API_BASE+"/api/accounts"}
-    ]
-    : [
-      {name:"Bearer",headers:{"Authorization":"Bearer "+sessionId,"Content-Type":"application/json"},url:API_BASE+"/api/accounts"},
-      {name:"X-Deriv-Session",headers:{"X-Deriv-Session":sessionId,"Content-Type":"application/json"},url:API_BASE+"/api/accounts"},
-      {name:"X-Session-ID",headers:{"X-Session-ID":sessionId,"Content-Type":"application/json"},url:API_BASE+"/api/accounts"},
-      {name:"Cookie/session",headers:{"Content-Type":"application/json"},url:API_BASE+"/api/accounts"}
-    ];
+  // The OAuth worker stores the real Deriv access token server-side.
+  // The browser must send the worker's session ID, not the OAuth access token.
+  const attempts=[
+    {name:"Worker session query",headers:{"Content-Type":"application/json"},url:API_BASE+"/api/accounts?session="+encodeURIComponent(sessionId||"")},
+    {name:"Worker X-Session-ID",headers:{"X-Session-ID":sessionId,"Content-Type":"application/json"},url:API_BASE+"/api/accounts"},
+    {name:"Worker session cookie",headers:{"Content-Type":"application/json"},url:API_BASE+"/api/accounts"}
+  ];
+
   let lastError="No response";
   let lastHttp="";
   for(const attempt of attempts){
@@ -513,7 +507,7 @@ async function handleOAuthReturn(){
     }
   }
   setConn(false);
-  showDiag("CONNECTION STOPPED\nLast HTTP: "+(lastHttp||"none")+"\nReason: "+lastError+"\n\nThe Hub received the OAuth session, but the account service did not accept it. No password, OTP or secret is needed.");
+  showDiag("CONNECTION STOPPED\nLast HTTP: "+(lastHttp||"none")+"\nReason: "+lastError+"\n\nThe Hub reached the OAuth callback, but the worker account session was not accepted.",false);
   log("Connection failed: "+lastError);
   return false;
 }
@@ -537,13 +531,13 @@ function startSessionRecovery(){
 async function refreshBalance(){
   if(!state.account)return;
   try{
-    const headers=state.sessionId?{"Authorization":"Bearer "+state.sessionId}:{};    const r=await fetch(API_BASE+"/api/balance?account_id="+encodeURIComponent(state.account.id),{headers,credentials:"include",cache:"no-store"});
+    const headers=state.sessionId?{"X-Session-ID":state.sessionId}:{};    const r=await fetch(API_BASE+"/api/balance?account_id="+encodeURIComponent(state.account.id),{headers,credentials:"include",cache:"no-store"});
     if(r.ok){const d=await r.json();const b=Number(d.balance??d.data?.balance);if(Number.isFinite(b)){state.balance=b;$("balance").textContent=(state.account.currency||"USD")+" "+b.toFixed(2)}}
   }catch(e){}
 }
 
 async function getAuthWs(){
-  const headers={"content-type":"application/json"};  if(state.sessionId)headers.Authorization="Bearer "+state.sessionId;  const r=await fetch(API_BASE+"/api/ws-url",{method:"POST",headers,credentials:"include",cache:"no-store",body:JSON.stringify({account_id:state.account.id})});
+  const headers={"content-type":"application/json"};  if(state.sessionId)headers["X-Session-ID"]=state.sessionId;  const r=await fetch(API_BASE+"/api/ws-url",{method:"POST",headers,credentials:"include",cache:"no-store",body:JSON.stringify({account_id:state.account.id})});
   if(!r.ok)throw new Error("Trading channel unavailable");
   const d=await r.json();
   const url=d.data?.url||d.ws_url||d.websocket_url||d.url;
