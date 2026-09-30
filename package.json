@@ -1,1 +1,1 @@
-{"name":"deriv-strategy-hub-api","private":true,"engines":{"node":"24.x"}}
+{"name":"deriv-strategy-hub-api","private":true,"engines":{"node":"24.x"},"dependencies":{"oauth4webapi":"3.8.8"}}
