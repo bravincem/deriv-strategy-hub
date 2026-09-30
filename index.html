@@ -749,10 +749,36 @@ async function historicalBacktest(){
 $("historicalBtn").onclick=historicalBacktest;
 async function init(){
   $("greeting").textContent="Good "+(new Date().getHours()<12?"morning":new Date().getHours()<18?"afternoon":"evening");
+  const qp=new URLSearchParams(location.search);
+  const returning=qp.get("deriv_connected")==="1" || qp.get("deriv_connected")==="true" || qp.has("session");
+  if(returning){
+    const d=$("connectionDiag");
+    if(d){
+      d.style.display="block";
+      d.className="notice warn";
+      d.textContent="Deriv authorization returned. Connecting your DEMO account…";
+    }
+  }
   $("accountStatus").textContent="Checking connection…";
-  connectPublic();
-  renderDistribution();renderAnalysis();drawChart();
-  try{ await handleOAuthReturn(); }catch(e){ setConn(false); log("Connection startup error: "+(e.message||e)); }
+
+  // Authentication must run first so a harmless market/chart error cannot
+  // prevent the OAuth callback from completing.
+  try{ await handleOAuthReturn(); }
+  catch(e){
+    setConn(false);
+    const d=$("connectionDiag");
+    if(d){
+      d.style.display="block";
+      d.className="notice warn";
+      d.textContent="CONNECTION STARTUP ERROR\n"+(e.message||String(e));
+    }
+    log("Connection startup error: "+(e.message||e));
+  }
+
+  try{ connectPublic(); }catch(e){ log("Public market feed error: "+(e.message||e)); }
+  try{ renderDistribution(); }catch(e){}
+  try{ renderAnalysis(); }catch(e){}
+  try{ drawChart(); }catch(e){}
   startSessionRecovery();
 }
 window.addEventListener("resize",drawChart);
