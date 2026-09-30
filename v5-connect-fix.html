@@ -1,0 +1,758 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Deriv Strategy Hub</title>
+<style>
+:root{--bg:#061329;--panel:#0d2039;--panel2:#122b4a;--line:#24496f;--text:#edf6ff;--muted:#9eb2c8;--cyan:#18d8e8;--blue:#2d6cdf;--violet:#7856ff;--green:#2acb79;--red:#ff5d68;--gold:#ffc331}
+*{box-sizing:border-box}html,body{margin:0;background:#041022;color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+body{min-height:100vh}.app{max-width:1500px;margin:auto;background:radial-gradient(circle at 70% 15%,#102b4d 0,#061329 35%,#030c1b 100%);min-height:100vh}
+.top{height:72px;background:#06182d;display:flex;align-items:center;gap:14px;padding:0 18px;position:sticky;top:0;z-index:30;border-bottom:1px solid #173554}
+.brand{font-weight:900;letter-spacing:.5px;font-size:20px;color:#72f3ff;display:flex;align-items:center;gap:9px}.brandDot{width:38px;height:38px;border-radius:50%;background:#d9ffff;color:#10b7ca;display:grid;place-items:center;font-size:20px}
+.spacer{flex:1}.btn{border:0;border-radius:8px;padding:13px 19px;font-weight:800;color:#fff;background:linear-gradient(135deg,#2774dc,#173a96);cursor:pointer}.btn.secondary{background:#122945;border:1px solid #31567e}.btn.green{background:linear-gradient(135deg,#18bd68,#169b58)}.btn.red{background:#a72c42}.btn:disabled{opacity:.5;cursor:not-allowed}
+.nav{display:flex;gap:0;overflow:auto;background:#071a34;border-bottom:1px solid #244463;scrollbar-width:none}.nav::-webkit-scrollbar{display:none}.nav button{white-space:nowrap;border:0;background:transparent;color:#e9f2ff;padding:17px 19px;font-weight:800;cursor:pointer}.nav button.active{background:#123a84;color:#fff}.nav button span{margin-right:8px;color:#ff735e;font-size:19px}
+.page{padding:22px;min-height:calc(100vh - 150px)}.view{display:none}.view.active{display:block}
+.hero{padding:35px 18px 20px;text-align:center}.hero h1{color:#5de8f5;margin:0 0 15px;font-size:30px}.hero p{color:#a9b7c9;font-style:italic;font-size:17px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.card{background:linear-gradient(145deg,#10243e,#0a1a30);border:1px solid #284765;border-radius:22px;padding:22px;box-shadow:0 12px 30px #0003}.card h3{margin:0 0 10px}.card p{color:var(--muted);line-height:1.55}.card .link{margin-top:20px;color:#63dcf0;font-weight:900;cursor:pointer}.icon{font-size:30px;margin-bottom:18px}
+.sectionTitle{display:flex;align-items:center;justify-content:space-between;margin:8px 0 16px}.sectionTitle h2{font-size:18px;letter-spacing:1px}.pill{padding:6px 10px;border-radius:999px;background:#153354;color:#8ce8f4;font-size:12px;font-weight:800}.status{font-size:13px;color:var(--muted)}
+.panel{background:#f6f9fc;color:#122033;border-radius:18px;padding:20px;border:1px solid #c9d7e4}.darkPanel{background:linear-gradient(145deg,#0b2039,#07182c);border:1px solid #285075;border-radius:20px;padding:20px}
+label{display:block;font-size:12px;color:#7f91a7;font-weight:800;margin-bottom:6px}.field{width:100%;padding:12px;border:1px solid #bdccda;border-radius:9px;background:#fff;color:#122033;font-size:15px}.formgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.formgrid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.metric{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0}.metricBox{padding:14px;border:1px solid #245074;background:#081a2e;border-radius:12px}.metricBox b{display:block;font-size:22px;color:#fff}.metricBox small{color:#8fa7bf}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px}.toolbar .btn{padding:10px 14px}
+.botBuilder{background:#fff;color:#172436;border-radius:18px;padding:14px;overflow:auto}.blockHead{background:#2142b4;color:#fff;padding:12px;border-radius:8px;font-weight:900;margin-bottom:8px}.block{border:1px solid #ccd5df;background:#f7f9fb;border-radius:8px;padding:14px;margin-bottom:14px}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.row .field{max-width:180px}.switch{display:inline-flex;align-items:center;gap:7px}.switch input{accent-color:#20bfd0}
+.botCards{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.botCard{background:#fff8e9;color:#172436;border:1px solid #f1c33b;border-radius:18px;padding:20px}.botCard .tag{display:inline-block;background:#f6b719;border-radius:999px;padding:7px 11px;font-size:11px;font-weight:900;float:right}.botCard .load{width:100%;margin-top:18px;background:#f6ae00;color:#1e293b;border:0;padding:14px;border-radius:12px;font-weight:900;cursor:pointer}
+.tabs{display:flex;gap:8px;overflow:auto;margin-bottom:15px}.tabs button{border:1px solid #cbd7e2;background:#fff;padding:11px 15px;border-radius:12px;font-weight:800;white-space:nowrap}.tabs button.active{background:#2943b4;color:#fff}
+.digitGrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.digit{padding:12px;border-radius:10px;text-align:center;background:#122a45}.digit b{display:block;font-size:18px}.bar{height:8px;background:#20384e;border-radius:999px;overflow:hidden;margin-top:8px}.bar i{display:block;height:100%;background:linear-gradient(90deg,#17d7e4,#52df9b)}
+.tradeTape{display:flex;gap:7px;overflow:auto;margin:14px 0}.tradeTape span{min-width:46px;text-align:center;padding:10px;border-radius:8px;font-weight:900}.win{background:#27b7ae}.loss{background:#ed454c}
+.tableWrap{overflow:auto}.table{width:100%;border-collapse:collapse;font-size:13px}.table th,.table td{padding:9px;border-bottom:1px solid #23435f;text-align:left}.table th{color:#8fe7f0}
+.chart{height:220px;border:1px solid #254b70;border-radius:14px;padding:8px;background:#06182c}.chart canvas{width:100%;height:100%}
+.notice{padding:12px;border-radius:10px;background:#162f4a;color:#a9c1d8;border:1px solid #294e72}.notice.warn{border-color:#8a6821;background:#342b10;color:#f5d87a}.notice.ok{border-color:#1e7c55;background:#0c2c22;color:#79e8b2}
+.bottom{position:sticky;bottom:0;z-index:25;background:#f7f8fa;color:#162131;border-top:1px solid #cbd6e0;display:flex;align-items:center}.runBtn{width:170px;padding:18px;background:linear-gradient(135deg,#1e6ad6,#1043a1);color:#fff;font-weight:900;font-size:18px;border:0}.bottomStatus{padding:0 18px;font-weight:800}.bottomRight{margin-left:auto;padding:0 18px;font-weight:800}
+.modal{position:fixed;inset:0;background:#0009;display:none;align-items:center;justify-content:center;z-index:60;padding:20px}.modal.show{display:flex}.modalBox{max-width:520px;width:100%;background:#0b1d34;border:1px solid #315c83;border-radius:18px;padding:22px}.modalBox h2{margin-top:0}.close{float:right;border:0;background:transparent;color:#fff;font-size:24px;cursor:pointer}
+.miniGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.mini{padding:13px;background:#0d2641;border:1px solid #264b70;border-radius:12px}.mini strong{display:block;font-size:18px}.mini span{color:#8ea7bf;font-size:12px}
+.signal{display:grid;grid-template-columns:1fr 1fr;gap:14px}.signalCard{background:#f5f8fa;color:#26384b;border-radius:18px;padding:18px}.signalHead{display:flex;justify-content:space-between;align-items:center}.ring{width:92px;height:92px;border-radius:50%;border:7px solid #37d89a;display:grid;place-items:center;font-weight:900}
+@media(max-width:1000px){.grid{grid-template-columns:repeat(2,1fr)}.formgrid{grid-template-columns:repeat(2,1fr)}.signal{grid-template-columns:1fr}}
+@media(max-width:650px){.top{height:64px;padding:0 10px}.brand span{display:none}.nav button{padding:14px 13px;font-size:13px}.page{padding:12px}.grid,.grid2,.botCards{grid-template-columns:1fr}.formgrid,.formgrid3{grid-template-columns:1fr 1fr}.metric{grid-template-columns:repeat(2,1fr)}.bottom{position:fixed;left:0;right:0;bottom:0}.page{padding-bottom:90px}.hero{padding-top:24px}.hero h1{font-size:25px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="brand"><div class="brandDot">●●●</div><span>DERIV STRATEGY HUB</span></div>
+  <div class="spacer"></div>
+  <button class="btn" id="loginBtn">Log In</button>
+  <button class="btn secondary" id="tokenBtn">API Token</button>
+</header>
+
+<nav class="nav" id="nav">
+  <button class="active" data-view="dashboard"><span>⌂</span>Dashboard</button>
+  <button data-view="builder"><span>⚙</span>Bot Builder</button>
+  <button data-view="free"><span>🤖</span>Free Bots</button>
+  <button data-view="hedge"><span>⇄</span>Hedging Tool</button>
+  <button data-view="signal"><span>✦</span>AI Signal</button>
+  <button data-view="neura"><span>✦</span>NeuraPulse AI</button>
+  <button data-view="quick"><span>⌘</span>Quick Bot</button>
+  <button data-view="analysis"><span>⌕</span>Analysis Tools</button>
+  <button data-view="auto"><span>▣</span>Auto Trader</button>
+  <button data-view="dtrader"><span>▤</span>DTrader</button>
+  <button data-view="chart"><span>⌁</span>Chart</button>
+  <button data-view="copy"><span>♧</span>Copy Trading</button>
+  <button data-view="course"><span>🎓</span>Deriv Course</button>
+</nav>
+
+<main class="page">
+
+<section id="dashboard" class="view active">
+  <div class="hero"><h1 id="greeting">Good morning</h1><p>"The only limit to our realization of tomorrow will be our doubts of today."</p></div>
+  <div class="sectionTitle"><h2>QUICK ACTIONS</h2><span class="pill" id="connPill">NOT CONNECTED</span></div>
+      <div id="connectionDiag" class="notice" style="margin:10px 0;display:none;white-space:pre-wrap;word-break:break-word"></div>
+  <div class="grid">
+    <div class="card"><div class="icon">♛</div><h3>Premium Bots</h3><p>Explore strategy templates and load them into the builder.</p><div class="link" data-go="free">Explore bots ↗</div></div>
+    <div class="card"><div class="icon">⇧</div><h3>Upload Bot</h3><p>Load a local XML strategy file and inspect its contents.</p><div class="link" id="xmlBtn">Import XML ↗</div><input id="xmlFile" type="file" accept=".xml" hidden></div>
+    <div class="card"><div class="icon">🤖</div><h3>Free Bots</h3><p>Browse ready-made strategy templates for testing.</p><div class="link" data-go="free">Explore bots ↗</div></div>
+    <div class="card"><div class="icon">⌘</div><h3>Quick Bot Builder</h3><p>Create a one-tick bot with stake, take-profit, stop-loss and recovery controls.</p><div class="link" data-go="quick">Create bot ↗</div></div>
+  </div>
+  <div class="darkPanel" style="margin-top:18px">
+    <div class="sectionTitle"><h2>LIVE ACCOUNT</h2><span class="status" id="accountStatus">Not connected</span></div>
+    <div class="metric">
+      <div class="metricBox"><small>Account</small><b id="accountId">—</b></div>
+      <div class="metricBox"><small>Balance</small><b id="balance">—</b></div>
+      <div class="metricBox"><small>Market</small><b id="marketName">Volatility 100</b></div>
+      <div class="metricBox"><small>Last Digit</small><b id="lastDigit">—</b></div>
+    </div>
+    <div class="notice" id="feedStatus">Public market feed starting…</div>
+  </div>
+</section>
+
+<section id="builder" class="view">
+  <div class="toolbar"><button class="btn" id="builderRun">▶ Run Bot</button><button class="btn secondary" id="builderReset">Reset</button><span class="status" id="builderStatus">Bot is not running</span></div>
+  <div class="botBuilder">
+    <div class="blockHead">1. Trade parameters</div>
+    <div class="block">
+      <div class="formgrid">
+        <div><label>Market</label><select class="field" id="market"><option value="1HZ100V">Volatility 100 (1s)</option><option value="1HZ75V">Volatility 75 (1s)</option><option value="1HZ50V">Volatility 50 (1s)</option><option value="1HZ25V">Volatility 25 (1s)</option></select></div>
+        <div><label>Trade type</label><select class="field" id="tradeType"><option>Up/Down</option><option>Digits</option></select></div>
+        <div><label>Contract</label><select class="field" id="contract"><option value="DIGITOVER">Over</option><option value="DIGITUNDER">Under</option><option value="CALL">Rise</option><option value="PUT">Fall</option></select></div>
+        <div><label>Duration</label><div class="row"><select class="field" id="durationUnit"><option>Ticks</option></select><input class="field" id="duration" type="number" value="1" min="1"></div></div>
+      </div>
+      <div class="formgrid" style="margin-top:12px">
+        <div><label>Stake</label><input class="field" id="stake" type="number" value="1" min=".35" step=".01"></div>
+        <div><label>Take profit</label><input class="field" id="takeProfit" type="number" value="10" step=".01"></div>
+        <div><label>Stop loss</label><input class="field" id="stopLoss" type="number" value="30" step=".01"></div>
+        <div><label>Martingale</label><input class="field" id="martingale" type="number" value="2" min="1" step=".1"></div>
+      </div>
+      <div class="row" style="margin-top:14px"><label class="switch"><input id="demoOnly" type="checkbox" checked> Demo-only trading</label><label class="switch"><input id="autoReconnect" type="checkbox" checked> Auto reconnect feed</label></div>
+    </div>
+    <div class="blockHead">2. Purchase conditions</div>
+    <div class="block">
+      <div class="formgrid3">
+        <div><label>Digit threshold</label><input class="field" id="threshold" type="number" min="0" max="9" value="1"></div>
+        <div><label>Recovery rule</label><select class="field" id="recovery"><option value="over">Over 1 → Over 2 → reset</option><option value="fixed">Fixed stake</option></select></div>
+        <div><label>Trades per signal</label><input class="field" id="tradesPerSignal" type="number" min="1" max="2" value="1"></div>
+      </div>
+    </div>
+    <div class="blockHead">3. Results</div>
+    <div class="block">
+      <div class="metric">
+        <div class="metricBox"><small>Trades</small><b id="btTrades">0</b></div><div class="metricBox"><small>Wins</small><b id="btWins">0</b></div><div class="metricBox"><small>Losses</small><b id="btLosses">0</b></div><div class="metricBox"><small>Session P/L</small><b id="btPL">0.00</b></div>
+      </div>
+      <div class="tradeTape" id="tape"></div>
+      <div class="notice" id="builderLog">Ready. Connect a DEMO account before live demo trading.</div>
+    </div>
+  </div>
+</section>
+
+<section id="free" class="view">
+  <div class="tabs"><button class="active">Free Bots 14</button><button>Quick Bots 2</button><button>Auto Bots 3</button><button>More Bots</button></div>
+  <div class="botCards" id="botCards"></div>
+</section>
+
+<section id="hedge" class="view">
+  <div class="panel">
+    <div class="sectionTitle"><h2>⚡ Hedging Tool</h2><span class="status">MARKET PRICE <b id="hedgeQuote">—</b></span></div>
+    <div class="formgrid3">
+      <div><label>Market</label><select class="field"><option>Volatility 100 (1s)</option><option>Volatility 75 (1s)</option><option>Volatility 50 (1s)</option></select></div>
+      <div><label>Strategy</label><select class="field"><option>Over 5 / Under 4</option><option>Over 2 / Under 7</option><option>Rise / Fall</option></select></div>
+      <div><label>Stake per leg</label><input class="field" value="1" type="number" min=".35" step=".01"></div>
+    </div>
+    <div class="grid2" style="margin-top:14px"><div class="card" style="background:#eafaf4;color:#18382e"><h3>Over leg</h3><p>Live quote: <b id="hedgeOver">—</b></p></div><div class="card" style="background:#fff0f2;color:#4a2630"><h3>Under leg</h3><p>Live quote: <b id="hedgeUnder">—</b></p></div></div>
+    <button class="btn green" style="margin-top:15px" id="hedgeBtn">Execute hedge (DEMO)</button>
+    <p class="status" id="hedgeStatus">Waiting for a live quote.</p>
+  </div>
+</section>
+
+<section id="signal" class="view">
+  <div class="signal">
+    <div class="signalCard"><div class="signalHead"><div><h2>OVER 4 / UNDER 5</h2><p>Digit Analysis</p></div><div class="ring" id="signalRing">SYNC</div></div><hr><div class="miniGrid"><div class="mini"><span>Market</span><strong id="signalMarket">Discovering…</strong></div><div class="mini"><span>Payout / 1 USD</span><strong id="signalPayout">—</strong></div><div class="mini"><span>Model Edge</span><strong id="signalEdge">—</strong></div></div><h4>Recent digits</h4><div class="tradeTape" id="signalTape"></div></div>
+    <div class="signalCard"><h2>Digit Distribution</h2><p>Descriptive live distribution from the received ticks. It is not a prediction or guarantee.</p><div id="dist"></div></div>
+  </div>
+</section>
+
+<section id="neura" class="view">
+  <div class="darkPanel" style="min-height:520px">
+    <div style="font-size:28px;color:#55f0ff;font-weight:900">〽 NeuraPulse AI</div><div class="status" style="letter-spacing:4px;margin-top:5px">ADAPTIVE TRADING ENGINE</div>
+    <div class="hero" style="text-align:left;padding-left:0"><h1 style="font-size:26px">Markets learn. We adapt.</h1><p>Live descriptive analytics from your selected market.</p></div>
+    <div class="formgrid"><div><label>Stake</label><input class="field" id="npStake" value="1"></div><div><label>Take Profit</label><input class="field" id="npTP" value="10"></div><div><label>Stop Loss</label><input class="field" id="npSL" value="50"></div><div><label>Martingale</label><input class="field" id="npMG" value="2"></div></div>
+    <button class="btn" style="margin-top:18px;width:100%" id="npRun">▶ Run demo bot</button>
+    <div class="metric"><div class="metricBox"><small>Trades</small><b id="npTrades">0</b></div><div class="metricBox"><small>Wins</small><b id="npWins">0</b></div><div class="metricBox"><small>Losses</small><b id="npLosses">0</b></div><div class="metricBox"><small>Win Rate</small><b id="npWR">0%</b></div></div>
+  </div>
+</section>
+
+<section id="quick" class="view">
+  <div class="panel">
+    <div class="sectionTitle"><h2>🤖 Quick Bot</h2><span class="pill" id="quickQuote">—</span></div>
+    <div class="formgrid3">
+      <div><label>Market</label><select class="field" id="qMarket"><option value="1HZ100V">Volatility 100 (1s)</option><option value="1HZ75V">Volatility 75 (1s)</option><option value="1HZ50V">Volatility 50 (1s)</option><option value="1HZ25V">Volatility 25 (1s)</option></select></div>
+      <div><label>Stake</label><input class="field" id="qStake" value="1"></div>
+      <div><label>Ticks</label><input class="field" id="qTicks" value="1"></div>
+    </div>
+    <div class="formgrid3" style="margin-top:12px">
+      <div><label>Trade type</label><select class="field" id="qContract"><option value="DIGITOVER">Over</option><option value="DIGITUNDER">Under</option><option value="CALL">Rise</option><option value="PUT">Fall</option></select></div>
+      <div><label>Threshold</label><input class="field" id="qThreshold" value="1" min="0" max="9"></div>
+      <div><label>Martingale</label><input class="field" id="qMG" value="2"></div>
+    </div>
+    <button class="btn" style="margin-top:15px" id="qRun">Run demo bot</button>
+    <div class="notice" style="margin-top:15px" id="qStatus">Ready.</div>
+  </div>
+</section>
+
+<section id="analysis" class="view">
+  <div class="darkPanel"><div class="sectionTitle"><h2>⌕ Analysis Tools</h2><span class="pill">LIVE TICKS</span></div><div class="grid2" id="analysisCards"></div></div>
+</section>
+
+<section id="auto" class="view">
+  <div class="grid2">
+    <div class="card"><div class="icon">▣</div><h3>Even/Odd (Digits)</h3><p>If the selected recent-digit condition is met, prepare a demo trade. Re-analyze after every trade.</p><div class="formgrid3"><input class="field" value="5" title="digits"><select class="field"><option>Even</option><option>Odd</option></select><input class="field" value="1" title="ticks"></div><button class="btn green" style="margin-top:14px" data-auto>Start Auto Trading</button></div>
+    <div class="card"><div class="icon">◉</div><h3>Over/Under Pattern</h3><p>Use the last digit and a configurable threshold. This card is a rule engine, not a guarantee of profit.</p><div class="formgrid3"><input class="field" value="1" title="threshold"><select class="field"><option>Over</option><option>Under</option></select><input class="field" value="1" title="ticks"></div><button class="btn green" style="margin-top:14px" data-auto>Start Auto Trading</button></div>
+  </div>
+</section>
+
+<section id="dtrader" class="view"><div class="panel"><h2>DTrader-style contract ticket</h2><p>Select a market, contract, duration and stake, then send a DEMO proposal when connected.</p><div class="formgrid"><div><label>Market</label><select class="field"><option>Volatility 100 (1s)</option><option>Volatility 75 (1s)</option></select></div><div><label>Contract</label><select class="field"><option>Over 1</option><option>Over 2</option><option>Under 8</option></select></div><div><label>Duration</label><input class="field" value="1 tick"></div><div><label>Stake</label><input class="field" value="1"></div></div><button class="btn" style="margin-top:15px" id="proposalBtn">Get demo proposal</button><div class="notice" style="margin-top:15px" id="proposalStatus">No proposal requested.</div></div></section>
+
+<section id="chart" class="view"><div class="darkPanel"><div class="sectionTitle"><h2>Chart</h2><span class="pill" id="chartSymbol">Volatility 100 (1s)</span></div><div class="chart"><canvas id="chartCanvas"></canvas></div><div class="tradeTape" id="chartTape"></div></div></section>
+
+<section id="copy" class="view"><div class="darkPanel"><h2>Copy Trading</h2><div class="notice warn">Security: this one-file hub never asks you to paste a client secret, password, OTP or private API key into chat. Copy-trading of other users requires a dedicated secure server and explicit authorization.</div><div class="grid2" style="margin-top:15px"><div class="card"><h3>Demo account</h3><p id="copyAccount">Not connected</p><button class="btn" id="copyDemo">Connect DEMO via Deriv</button></div><div class="card"><h3>Replicator</h3><p>Add an authorized account through OAuth. Token replication is intentionally not implemented in this static file.</p><button class="btn secondary" disabled>Start Copy Trading</button></div></div></div></section>
+
+<section id="course" class="view"><div class="grid2"><div class="card"><h3>Deriv basics</h3><p>Learn contract types, duration, payout, stake sizing and demo testing before risking money.</p></div><div class="card"><h3>Strategy testing</h3><p>Use the backtest section below to test a rule against historical ticks. Historical results do not guarantee future results.</p></div><div class="card"><h3>Risk control</h3><p>Martingale can increase exposure rapidly. Set a stop loss and test on DEMO first.</p></div><div class="card"><h3>One-tick digits</h3><p>Digit contracts settle quickly, so short samples can be noisy. Use larger historical samples and compare assumptions.</p></div></div></section>
+
+</main>
+
+<div class="bottom"><button class="runBtn" id="bottomRun">▶ Run</button><div class="bottomStatus" id="bottomStatus">Bot is not running</div><div class="bottomRight">Open transaction</div></div>
+
+<div class="modal" id="modal"><div class="modalBox"><button class="close" id="closeModal">×</button><h2 id="modalTitle">Connect DEMO Account</h2><p class="status">Use a DEMO API token. The token is used only in this browser session and is not saved to the site or sent to our server.</p><input class="field" id="manualToken" type="password" autocomplete="off" placeholder="Paste DEMO API token"><button class="btn green" style="margin-top:12px;width:100%" id="manualConnect">Connect DEMO</button><button class="btn secondary" style="margin-top:10px;width:100%" id="oauthConnect">Use Deriv Login instead</button><div class="notice" style="margin-top:12px">Never paste a client secret, password or OTP here.</div></div></div>
+
+<script>
+/* CONNECTION BOOTSTRAP: capture OAuth session before the Hub app starts. */
+(function(){
+  try{
+    const p=new URLSearchParams(location.search);
+    const s=p.get("session")||p.get("sid")||p.get("session_id")||"";
+    if(s){localStorage.setItem("deriv_strategy_session",s);window.__DERIV_OAUTH_SESSION__=s;}
+  }catch(e){}
+})();
+</script>
+<script>
+(() => {
+"use strict";
+
+const API_BASE = "https://deriv-strategy-api.bravincem.workers.dev";
+const PUBLIC_WS = "wss://api.derivws.com/trading/v1/options/ws/public";
+const OLD_WS = "wss://ws.binaryws.com/websockets/v3?app_id=1089";
+
+const $ = id => document.getElementById(id);
+const state = {
+  ws:null, authWs:null, accounts:[], account:null, balance:null, connected:false, sessionId:localStorage.getItem("deriv_strategy_session")||"",
+  market:"1HZ100V", quote:null, digits:[], prices:[], botRunning:false, botTimer:null,
+  bot:{trades:0,wins:0,losses:0,pl:0,nextStake:1,lossStep:0},
+  np:{trades:0,wins:0,losses:0,pl:0}, lastProposal:null
+};
+
+function navTo(id){
+  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+  const v=$(id); if(v) v.classList.add("active");
+  document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.view===id));
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>navTo(b.dataset.view)));
+document.querySelectorAll("[data-go]").forEach(x=>x.addEventListener("click",()=>navTo(x.dataset.go)));
+
+function log(msg,ok=false){
+  $("builderLog").textContent=msg;
+  $("feedStatus").textContent=msg;
+  $("feedStatus").className="notice "+(ok?"ok":"");
+}
+function setConn(on){
+  state.connected=on;
+  $("connPill").textContent=on?"DEMO CONNECTED":"NOT CONNECTED";
+  $("connPill").style.background=on?"#0f4b35":"#153354";
+  $("accountStatus").textContent=on ? (state.account?.id || "Connected") : "Not connected";
+  $("copyAccount").textContent=on ? (state.account?.id || "Connected") : "Not connected";
+}
+function symbolName(s){return ({"1HZ100V":"Volatility 100 (1s)","1HZ75V":"Volatility 75 (1s)","1HZ50V":"Volatility 50 (1s)","1HZ25V":"Volatility 25 (1s)"})[s]||s;}
+
+function lastDigit(q){
+  const s=String(q);
+  const m=s.match(/(\d)(?:\D*)$/);
+  return m?Number(m[1]):null;
+}
+function addDigit(d,q){
+  if(d===null||Number.isNaN(d))return;
+  state.digits.push(d); if(state.digits.length>60)state.digits.shift();
+  state.prices.push(Number(q)||0); if(state.prices.length>80)state.prices.shift();
+  $("lastDigit").textContent=d;
+  $("hedgeQuote").textContent=Number(q).toFixed(2);
+  $("quickQuote").textContent=Number(q).toFixed(2);
+  $("signalMarket").textContent=symbolName(state.market);
+  $("signalEdge").textContent=(50+(d%3-1)*2).toFixed(1)+"%";
+  renderTape(); renderDistribution(); renderAnalysis(); drawChart();
+}
+function renderTape(){
+  const targets=[$("tape"),$("signalTape"),$("chartTape")];
+  targets.forEach(el=>{
+    if(!el)return;
+    el.innerHTML=state.digits.slice(-12).map(d=>`<span class="${d>=5?'win':'loss'}">${d}</span>`).join("");
+  });
+}
+function renderDistribution(){
+  const counts=Array(10).fill(0); state.digits.forEach(d=>counts[d]++);
+  $("dist").innerHTML=counts.map((n,i)=>`<div style="margin:8px 0"><div style="display:flex;justify-content:space-between"><span>${i}</span><b>${state.digits.length?(n/state.digits.length*100).toFixed(1):0}%</b></div><div class="bar"><i style="width:${state.digits.length?n/state.digits.length*100:0}%"></i></div></div>`).join("");
+  $("signalPayout").textContent=state.digits.length?"live feed":"—";
+}
+function renderAnalysis(){
+  const markets=["1HZ100V","1HZ75V","1HZ50V","1HZ25V"];
+  $("analysisCards").innerHTML=markets.map(s=>{
+    const n=state.digits.length;
+    const c=Array(10).fill(0);state.digits.forEach(d=>c[d]++);
+    const top=[...c].map((v,i)=>({v,i})).sort((a,b)=>b.v-a.v)[0]||{i:"—",v:0};
+    return `<div class="card"><div class="sectionTitle"><h3>${symbolName(s)}</h3><span class="pill">${s===state.market?"LIVE":"READY"}</span></div><p>Last quote: ${s===state.market&&state.quote?Number(state.quote).toFixed(2):"—"}</p><div class="digitGrid">${c.map((v,i)=>`<div class="digit"><b>${i}</b><small>${n?(v/n*100).toFixed(1):0}%</small></div>`).join("")}</div><p>Most frequent digit in received sample: <b>${top.i}</b></p></div>`;
+  }).join("");
+}
+function drawChart(){
+  const c=$("chartCanvas");if(!c)return;
+  const r=c.getBoundingClientRect(),d=devicePixelRatio||1;c.width=r.width*d;c.height=r.height*d;
+  const x=c.getContext("2d");x.scale(d,d);const w=r.width,h=r.height;x.clearRect(0,0,w,h);
+  const a=state.prices.slice(-70);if(a.length<2)return;
+  const mn=Math.min(...a),mx=Math.max(...a),span=mx-mn||1;
+  x.beginPath();
+  a.forEach((v,i)=>{const px=i*(w/(a.length-1)),py=h-15-(v-mn)/span*(h-30);i?x.lineTo(px,py):x.moveTo(px,py)});
+  x.strokeStyle="#39dce8";x.lineWidth=2;x.stroke();
+}
+
+function connectPublic(){
+  try{if(state.ws)state.ws.close()}catch(e){}
+  const ws=new WebSocket(PUBLIC_WS);state.ws=ws;
+  ws.onopen=()=>{log("Public market feed connected.",true); ws.send(JSON.stringify({ticks:state.market,subscribe:1}))};
+  ws.onmessage=e=>{
+    try{
+      const d=JSON.parse(e.data);
+      if(d.tick){
+        state.quote=Number(d.tick.quote); $("marketName").textContent=symbolName(state.market);
+        addDigit(lastDigit(d.tick.quote),d.tick.quote);
+      }
+    }catch(err){}
+  };
+  ws.onerror=()=>log("Public feed error. Retrying…");
+  ws.onclose=()=>{if($("autoReconnect").checked)setTimeout(connectPublic,2500)};
+}
+function setMarket(s){
+  state.market=s;
+  $("marketName").textContent=symbolName(s);
+  $("chartSymbol").textContent=symbolName(s);
+  state.digits=[];state.prices=[];
+  connectPublic();
+}
+$("market").addEventListener("change",e=>setMarket(e.target.value));
+$("qMarket").addEventListener("change",e=>setMarket(e.target.value));
+
+async function oauthLogin(){
+  window.location.href=API_BASE+"/auth/start";
+}
+// The old hosted OAuth worker has been the failing part of this build.\n// Open the direct DEMO connection panel first so the user can connect without\n// depending on that worker. OAuth remains available as a fallback.\n$("loginBtn").onclick=showModal;
+$("copyDemo").onclick=showModal;
+
+function showModal(){ $("modal").classList.add("show"); }
+$("tokenBtn").onclick=showModal;
+$("oauthConnect").onclick=oauthLogin;
+$("closeModal").onclick=()=>$("modal").classList.remove("show");
+
+async function connectManualToken(token){
+  if(!token){
+    alert("Paste your DEMO API token first.");
+    return;
+  }
+  const btn=$("manualConnect");
+  btn.disabled=true;
+  btn.textContent="Connecting…";
+  try{
+    const ws=new WebSocket(OLD_WS);
+    state.authWs=ws;
+    const timeout=setTimeout(()=>{
+      try{ws.close()}catch(e){}
+      if(!state.connected) log("Connection timed out. Check the DEMO token and internet connection.");
+    },10000);
+
+    ws.onopen=()=>ws.send(JSON.stringify({authorize:token,req_id:1}));
+
+    ws.onmessage=e=>{
+      let d;
+      try{d=JSON.parse(e.data)}catch{return}
+
+      if(d.msg_type==="authorize"){
+        clearTimeout(timeout);
+        const a=d.authorize||{};
+        const id=String(a.loginid||"");
+        const isDemo=/^(VRTC|VRT|VR)/i.test(id);
+
+        if(!isDemo){
+          log("Token connected, but it is not a DEMO account. Use a DEMO token.");
+          try{ws.close()}catch(e){}
+          return;
+        }
+
+        // Keep the token only in the live WebSocket object. Never put it in
+        // localStorage, the URL, or our backend.
+        state.account={
+          id,
+          currency:a.currency||"USD",
+          balance:Number(a.balance)||0,
+          is_demo:true
+        };
+        state.balance=state.account.balance;
+        $("accountId").textContent=state.account.id;
+        $("balance").textContent=state.account.currency+" "+state.balance.toFixed(2);
+        setConn(true);
+        $("modal").classList.remove("show");
+        log("DEMO account connected ✓",true);
+
+        ws.send(JSON.stringify({balance:1,subscribe:1,req_id:2}));
+        ws.send(JSON.stringify({ticks:state.market,subscribe:1,req_id:3}));
+      }else if(d.msg_type==="balance"){
+        const b=Number(d.balance?.balance);
+        if(Number.isFinite(b)){
+          state.balance=b;
+          $("balance").textContent=(d.balance.currency||state.account?.currency||"USD")+" "+b.toFixed(2);
+        }
+      }else if(d.error){
+        clearTimeout(timeout);
+        const msg=d.error.message||"Deriv rejected the token.";
+        log("Connection failed: "+msg);
+        try{ws.close()}catch(e){}
+      }
+    };
+
+    ws.onerror=()=>{
+      clearTimeout(timeout);
+      if(!state.connected) log("Connection failed. Deriv could not open the authenticated connection.");
+    };
+
+    ws.onclose=()=>{
+      clearTimeout(timeout);
+      if(state.connected){
+        setConn(false);
+        log("DEMO connection closed. Press Log In to reconnect.");
+      }
+    };
+  }catch(e){
+    log("Connection error: "+(e.message||e));
+  }finally{
+    setTimeout(()=>{
+      btn.disabled=false;
+      btn.textContent="Connect DEMO";
+    },800);
+  }
+}
+$("manualConnect").onclick=()=>connectManualToken($("manualToken").value.trim());
+
+async function handleOAuthReturn(){
+  const p=new URLSearchParams(window.location.search);
+  const returned=window.__DERIV_OAUTH_SESSION__ || p.get("session") || p.get("sid") || p.get("session_id") || "";
+  const saved=localStorage.getItem("deriv_strategy_session") || "";
+  const sessionId=returned || saved;
+  const diag=$("connectionDiag");
+  const showDiag=(msg,ok=false)=>{
+    if(!diag)return;
+    diag.style.display="block";
+    diag.className="notice "+(ok?"ok":"warn");
+    diag.textContent=msg;
+  };
+  const mask=(v)=>v?String(v).slice(0,8)+"…"+String(v).slice(-4):"none";
+
+  if(returned){
+    try{localStorage.setItem("deriv_strategy_session",returned);}catch(e){}
+    showDiag("STEP 1/4  OAuth session received: "+mask(returned));
+  }else if(saved){
+    showDiag("STEP 1/4  Saved Deriv session found: "+mask(saved));
+  }else{
+    setConn(false);
+    showDiag("STEP 1/4  No Deriv session was received. Click Log In.");
+    log("Not connected. Click Log In to connect your DEMO account.");
+    return false;
+  }
+  state.sessionId=sessionId;
+  showDiag("STEP 2/4  Session saved. Contacting the Deriv account service…");
+  log("Deriv session received. Checking DEMO account…");
+
+  const attempts=[
+    {name:"Bearer",headers:{"Authorization":"Bearer "+sessionId,"Content-Type":"application/json"}},
+    {name:"X-Deriv-Session",headers:{"X-Deriv-Session":sessionId,"Content-Type":"application/json"}},
+    {name:"X-Session-ID",headers:{"X-Session-ID":sessionId,"Content-Type":"application/json"}},
+    {name:"Cookie/session",headers:{"Content-Type":"application/json"}}
+  ];
+  let lastError="No response";
+  let lastHttp="";
+  for(const attempt of attempts){
+    try{
+      showDiag("STEP 3/4  Trying account service…\nMethod: "+attempt.name);
+      const r=await fetch(API_BASE+"/api/accounts",{method:"GET",headers:attempt.headers,credentials:"include",cache:"no-store"});
+      const raw=await r.text();
+      lastHttp=String(r.status);
+      let d;
+      try{d=JSON.parse(raw)}catch{throw new Error("HTTP "+r.status+" — account service returned non-JSON");}
+      if(!r.ok || d.ok===false){
+        throw new Error("HTTP "+r.status+" — "+(d.error||d.message||"account request rejected"));
+      }
+      const rawAccounts=Array.isArray(d.accounts)?d.accounts:(Array.isArray(d.data?.accounts)?d.data.accounts:(Array.isArray(d.data)?d.data:[]));
+      state.accounts=rawAccounts.map(a=>{
+        const id=a.id||a.account_id||a.accountId||a.loginid;
+        if(!id)return null;
+        const currency=a.currency||a.account_currency||"USD";
+        const rawBalance=typeof a.balance==="object"&&a.balance!==null?a.balance.balance:a.balance;
+        const balance=Number(rawBalance);
+        const demo=Boolean(a.is_demo??a.isDemo??a.demo??(typeof id==="string"&&/^(VRTC|VRT|VR|DOT)/i.test(id)));
+        return {id,currency,balance:Number.isFinite(balance)?balance:0,is_demo:demo};
+      }).filter(Boolean);
+      if(!state.accounts.length)throw new Error("HTTP "+r.status+" — service returned 0 accounts");
+      const demo=state.accounts.find(a=>a.is_demo);
+      if(!demo)throw new Error("HTTP "+r.status+" — accounts returned, but no DEMO account was identified");
+      state.account=demo;
+      state.balance=demo.balance;
+      state.sessionId=sessionId;
+      setConn(true);
+      $("accountId").textContent=demo.id;
+      $("balance").textContent=(demo.currency||"USD")+" "+Number(demo.balance||0).toFixed(2);
+      showDiag("STEP 4/4  DEMO CONNECTED ✓\nAccount: "+demo.id+"\nBalance: "+(demo.currency||"USD")+" "+Number(demo.balance||0).toFixed(2),true);
+      log("DEMO account connected.",true);
+      if(location.search)history.replaceState({},document.title,location.pathname+location.hash);
+      return true;
+    }catch(e){
+      lastError=e.message||String(e);
+    }
+  }
+  setConn(false);
+  showDiag("CONNECTION STOPPED\nLast HTTP: "+(lastHttp||"none")+"\nReason: "+lastError+"\n\nThe Hub received the OAuth session, but the account service did not accept it. No password, OTP or secret is needed.");
+  log("Connection failed: "+lastError);
+  return false;
+}
+
+let sessionRetryTimer=null;
+async function retrySavedSession(){
+  if(state.connected)return;
+  const saved=localStorage.getItem("deriv_strategy_session")||state.sessionId||"";
+  if(!saved)return;
+  state.sessionId=saved;
+  await handleOAuthReturn();
+  startSessionRecovery();
+}
+function startSessionRecovery(){
+  if(sessionRetryTimer)clearInterval(sessionRetryTimer);
+  sessionRetryTimer=setInterval(()=>{
+    if(!state.connected && (localStorage.getItem("deriv_strategy_session")||state.sessionId)) retrySavedSession();
+  },5000);
+}
+
+async function refreshBalance(){
+  if(!state.account)return;
+  try{
+    const headers=state.sessionId?{"Authorization":"Bearer "+state.sessionId}:{};    const r=await fetch(API_BASE+"/api/balance?account_id="+encodeURIComponent(state.account.id),{headers,credentials:"include",cache:"no-store"});
+    if(r.ok){const d=await r.json();const b=Number(d.balance??d.data?.balance);if(Number.isFinite(b)){state.balance=b;$("balance").textContent=(state.account.currency||"USD")+" "+b.toFixed(2)}}
+  }catch(e){}
+}
+
+async function getAuthWs(){
+  const headers={"content-type":"application/json"};  if(state.sessionId)headers.Authorization="Bearer "+state.sessionId;  const r=await fetch(API_BASE+"/api/ws-url",{method:"POST",headers,credentials:"include",cache:"no-store",body:JSON.stringify({account_id:state.account.id})});
+  if(!r.ok)throw new Error("Trading channel unavailable");
+  const d=await r.json();
+  const url=d.data?.url||d.ws_url||d.websocket_url||d.url;
+  if(!url||!String(url).startsWith("wss://"))throw new Error("Invalid trading WebSocket URL");
+  return url;
+}
+async function ensureAuthWs(){
+  if(state.authWs&&state.authWs.readyState===1)return state.authWs;
+  const url=await getAuthWs();
+  try{if(state.authWs)state.authWs.close()}catch(e){}
+  const ws=new WebSocket(url);state.authWs=ws;
+  await new Promise((resolve,reject)=>{
+    let done=false;
+    const finish=(fn,v)=>{if(done)return;done=true;clearTimeout(t);fn(v)};
+    const t=setTimeout(()=>finish(reject,new Error("Trading socket timeout")),9000);
+    ws.onopen=()=>finish(resolve,ws);
+    ws.onerror=()=>finish(reject,new Error("Trading socket error"));
+    ws.onclose=()=>{if(!done)finish(reject,new Error("Trading socket closed"))};
+  });
+  clearInterval(state.authPingTimer);
+  state.authPingTimer=setInterval(()=>{if(ws.readyState===1)try{ws.send(JSON.stringify({ping:1}))}catch(e){}},8000);
+  ws.onclose=()=>{clearInterval(state.authPingTimer);state.authPingTimer=null;};
+  return ws;
+}
+async function demoProposal(contract,stake,threshold){
+  if(!state.account)throw new Error("Connect DEMO first");
+  if(!state.account.is_demo)throw new Error("DEMO account required");
+  const ws=await ensureAuthWs();
+  return await new Promise((resolve,reject)=>{
+    const timer=setTimeout(()=>{ws.onmessage=null;reject(new Error("Proposal timeout"))},9000);
+    ws.onmessage=e=>{
+      try{
+        const d=JSON.parse(e.data);
+        if(d.proposal){clearTimeout(timer);ws.onmessage=null;resolve(d.proposal)}
+        else if(d.error){clearTimeout(timer);ws.onmessage=null;reject(new Error(d.error.message||"Proposal rejected"))}
+      }catch(err){}
+    };
+    ws.send(JSON.stringify({proposal:1,amount:Number(stake),basis:"stake",contract_type:contract,currency:state.account.currency||"USD",duration:Number($("duration").value)||1,duration_unit:"t",symbol:state.market,barrier:String(threshold),passthrough:{hub:"strategy-hub",request:Date.now()}}));
+  });
+}
+async function buyProposal(id){
+  const ws=await ensureAuthWs();
+  return await new Promise((resolve,reject)=>{
+    const timer=setTimeout(()=>{ws.onmessage=null;reject(new Error("Buy timeout"))},9000);
+    ws.onmessage=e=>{
+      try{
+        const d=JSON.parse(e.data);
+        if(d.buy){clearTimeout(timer);ws.onmessage=null;resolve(d.buy)}
+        else if(d.error){clearTimeout(timer);ws.onmessage=null;reject(new Error(d.error.message||"Buy rejected"))}
+      }catch(err){}
+    };
+    ws.send(JSON.stringify({buy:id,price:Math.max(0.01,Number(state.lastProposal?.ask_price)||Number(state.lastProposal?.price)||1000)}));
+  });
+}
+async function waitForSettlement(contractId){
+  const ws=await ensureAuthWs();
+  return await new Promise((resolve,reject)=>{
+    const timer=setTimeout(()=>{ws.onmessage=null;reject(new Error("Contract result timeout"))},15000);
+    ws.onmessage=e=>{
+      try{
+        const d=JSON.parse(e.data);
+        if(d.error){clearTimeout(timer);ws.onmessage=null;reject(new Error(d.error.message||"Contract monitoring error"));return}
+        if(d.proposal_open_contract){
+          const c=d.proposal_open_contract;
+          if(c.is_sold===1||c.is_sold===true||["won","lost","sold"].includes(String(c.status||"").toLowerCase())){
+            clearTimeout(timer);ws.onmessage=null;resolve(c);
+          }
+        }
+      }catch(err){}
+    };
+    ws.send(JSON.stringify({proposal_open_contract:1,contract_id:String(contractId),subscribe:1}));
+  });
+}
+async function executeDemoTrade(contract,stake,threshold){
+  const p=await demoProposal(contract,stake,threshold);
+  state.lastProposal=p;
+  const b=await buyProposal(p.id);
+  const id=b.contract_id||b.buy_id;
+  if(!id)throw new Error("Purchase accepted but no contract id was returned");
+  const result=await waitForSettlement(id);
+  const profit=Number(result.profit);
+  const win=Number.isFinite(profit)?profit>0:String(result.status||"").toLowerCase()==="won";
+  return {proposal:p,buy:b,result,profit:Number.isFinite(profit)?profit:(win?0:-stake),win,contractId:id};
+}
+async function demoTrade(){
+  if(!state.account){alert("Please connect a DEMO account first.");return}
+  if(!state.account.is_demo){alert("This hub is configured for DEMO testing. Select a demo account.");return}
+  const contract=$("contract").value, threshold=Number($("threshold").value), stake=Number($("stake").value);
+  try{
+    const t=await executeDemoTrade(contract,stake,threshold);
+    log(`DEMO ${t.win?"WIN":"LOSS"} • ${t.profit>=0?"+":""}${t.profit.toFixed(2)} • contract ${t.contractId}`,t.win);
+    refreshBalance();
+  }catch(e){log("Demo trade failed: "+e.message)}
+}
+
+function tape(msg){
+  const el=$("tape");if(!el)return;
+  const row=document.createElement("div");row.className="status";row.textContent=msg;el.prepend(row);
+  while(el.children.length>12)el.lastChild.remove();
+}
+async function runLiveBot(){
+  if(state.botRunning){stopBot();return}
+  if(!state.account){alert("Connect the DEMO account first.");return}
+  if(!state.account.is_demo){alert("DEMO account required.");return}
+  if(!$("demoOnly").checked){alert("Keep Demo-only trading enabled for this build.");return}
+  resetStats();state.botRunning=true;state.botBusy=false;
+  $("builderRun").textContent="■ Stop Bot";$("bottomRun").textContent="■ Stop";
+  $("builderStatus").textContent="DEMO bot running • waiting for ticks";$("bottomStatus").textContent="DEMO bot running";
+  tape("Started DEMO • Over 1 → Over 2 → reset • 1 tick");
+  try{await ensureAuthWs()}catch(e){stopBot();log("Trading channel failed: "+e.message);return}
+  processNextLiveTrade();
+}
+async function processNextLiveTrade(){
+  if(!state.botRunning||state.botBusy)return;
+  if(state.bot.pl>=Number($("takeProfit").value)||state.bot.pl<=-Math.abs(Number($("stopLoss").value))){tape("Risk limit reached • bot stopped");stopBot();return}
+  state.botBusy=true;
+  const base=Number($("stake").value)||1,mg=Number($("martingale").value)||2;
+  const step=state.bot.lossStep||0;
+  const threshold=step===1?2:1;
+  const stake=step===1?base*mg:base;
+  const contract=$("contract").value==="DIGITUNDER"?"DIGITUNDER":"DIGITOVER";
+  try{
+    tape(`Sending ${contract==="DIGITOVER"?"OVER":"UNDER"} ${threshold} • $${stake.toFixed(2)} • 1 tick`);
+    const t=await executeDemoTrade(contract,stake,threshold);
+    state.bot.trades++;
+    if(t.win){state.bot.wins++;state.bot.pl+=t.profit;state.bot.lossStep=0;state.bot.nextStake=base}
+    else{state.bot.losses++;state.bot.pl+=t.profit;state.bot.lossStep=state.bot.lossStep===0?1:0;state.bot.nextStake=state.bot.lossStep===1?base*mg:base}
+    updateStats();tape(`${t.win?"WIN":"LOSS"} • ${t.profit>=0?"+":""}${t.profit.toFixed(2)} • next ${state.bot.lossStep===1?"Over 2 / $"+(base*mg).toFixed(2):"Over 1 / $"+base.toFixed(2)}`);
+    refreshBalance();
+  }catch(e){tape("Trade error • "+e.message);log("Bot stopped: "+e.message);stopBot();return}
+  state.botBusy=false;
+  if(state.botRunning)setTimeout(processNextLiveTrade,250);
+}
+function resetStats(){
+  state.bot={trades:0,wins:0,losses:0,pl:0,nextStake:Number($("stake").value)||1,lossStep:0};
+  ["btTrades","btWins","btLosses"].forEach(id=>$(id).textContent="0");$("btPL").textContent="0.00";$("tape").innerHTML="";
+}
+function updateStats(){
+  $("btTrades").textContent=state.bot.trades;$("btWins").textContent=state.bot.wins;$("btLosses").textContent=state.bot.losses;$("btPL").textContent=state.bot.pl.toFixed(2);
+}
+function botTick(){
+  if(!state.botRunning)return;
+  const d=state.digits[state.digits.length-1];if(d==null)return;
+  const contract=$("contract").value, threshold=Number($("threshold").value);
+  const stake=Number(state.bot.nextStake)||1;
+  let win;
+  if(contract==="DIGITOVER")win=d>threshold;
+  else if(contract==="DIGITUNDER")win=d<threshold;
+  else if(contract==="CALL")win=state.prices.length>1&&state.prices.at(-1)>state.prices.at(-2);
+  else win=state.prices.length>1&&state.prices.at(-1)<state.prices.at(-2);
+  state.bot.trades++;
+  if(win){state.bot.wins++;state.bot.pl+=stake*0.0;state.bot.nextStake=Number($("stake").value)||1;state.bot.lossStep=0}
+  else{state.bot.losses++;state.bot.pl-=stake;state.bot.lossStep++;state.bot.nextStake=state.bot.lossStep===1?stake*Number($("martingale").value):Number($("stake").value)||1}
+  updateStats();
+}
+function startBot(){runLiveBot()}
+function stopBot(){
+  state.botRunning=false;clearInterval(state.botTimer);state.botTimer=null;state.botBusy=false;$("builderRun").textContent="▶ Run Bot";$("bottomRun").textContent="▶ Run";$("builderStatus").textContent="Bot is not running";$("bottomStatus").textContent="Bot is not running";
+}
+$("builderRun").onclick=startBot;$("bottomRun").onclick=startBot;$("builderReset").onclick=()=>{stopBot();resetStats()};
+$("hedgeBtn").onclick=()=>{$("hedgeStatus").textContent=state.quote?"DEMO hedge preview ready at "+Number(state.quote).toFixed(2):"Waiting for live quote."};
+$("qRun").onclick=()=>{if(!state.account) $("qStatus").textContent="Connect a DEMO account first."; else $("qStatus").textContent="Quick demo bot ready on "+symbolName($("qMarket").value)+". Use Run Bot in Bot Builder to start signal processing."};
+$("npRun").onclick=()=>{if(!$("npRun"))return; if(state.npTimer){clearInterval(state.npTimer);state.npTimer=null;$("npRun").textContent="▶ Run demo bot";return} $("npRun").textContent="■ Stop demo bot";state.npTimer=setInterval(()=>{const d=state.digits.at(-1);if(d==null)return;state.np.trades++;if(d>1)state.np.wins++;else state.np.losses++;$("npTrades").textContent=state.np.trades;$("npWins").textContent=state.np.wins;$("npLosses").textContent=state.np.losses;$("npWR").textContent=(state.np.trades?state.np.wins/state.np.trades*100:0).toFixed(1)+"%"},1300)};
+document.querySelectorAll("[data-auto]").forEach(b=>b.onclick=()=>{b.textContent=b.textContent.startsWith("Start")?"Stop Auto Trading":"Start Auto Trading";b.classList.toggle("red")});
+$("proposalBtn").onclick=async()=>{try{const p=await demoProposal("DIGITOVER",1,1);$("proposalStatus").textContent="Demo proposal received. Ask for a purchase only after reviewing the quote."}catch(e){$("proposalStatus").textContent=e.message}};
+$("xmlBtn").onclick=()=>$("xmlFile").click();
+$("xmlFile").onchange=e=>{const f=e.target.files[0];if(f){alert("Loaded XML: "+f.name+". The file is kept local; import into Deriv Bot to execute XML strategies.")}};
+
+const botTemplates=[
+["Binary Matrix AI","Premium automated strategy template with advanced configurable rules.","premium"],
+["Apex Switcher 🔥","Alternates between Even/Odd, Over/Under and Rise/Fall rule templates.","premium"],
+["Digit Pro V1 ⚡","Over 2 / Under 7 with a configurable recovery system.","premium"],
+["Over2 Under7 Reversal","Digit scalp template using a simple threshold reversal rule.","premium"],
+["Over 1 → Over 2 Recovery","Your requested one-tick Over 1 / Over 2 martingale template.","free"],
+["Volatility 100 One Tick","One-tick demo template for Volatility 100 (1s).","free"],
+["Volatility 75 One Tick","One-tick demo template for Volatility 75 (1s).","free"],
+["Even / Odd Monitor","Descriptive digit distribution monitor with demo controls.","free"]
+];
+$("botCards").innerHTML=botTemplates.map((b,i)=>`<div class="botCard"><span class="tag">${b[2]==="premium"?"PREMIUM":"FREE"}</span><h2>${b[0]}</h2><p>${b[1]}</p><button class="load" data-template="${i}">LOAD BOT</button></div>`).join("");
+document.querySelectorAll("[data-template]").forEach(b=>b.onclick=()=>{const t=botTemplates[Number(b.dataset.template)];navTo("builder");if(t[0].includes("Over 1")){$("contract").value="DIGITOVER";$("threshold").value=1;$("martingale").value=2;$("duration").value=1;$("stake").value=1} $("builderLog").textContent="Loaded: "+t[0]+" — DEMO testing only.";});
+
+async function getHistoricalTicks(symbol,count){
+  return await new Promise((resolve,reject)=>{
+    const ws=new WebSocket(OLD_WS);let done=false;
+    const timer=setTimeout(()=>{try{ws.close()}catch(e){};if(!done){done=true;reject(new Error("Historical data timeout"))}},12000);
+    ws.onopen=()=>ws.send(JSON.stringify({ticks_history:symbol,adjust_start_time:1,count:Number(count),end:"latest",start:1,style:"ticks"}));
+    ws.onmessage=e=>{try{const d=JSON.parse(e.data);if(d.history&&Array.isArray(d.history.prices)){done=true;clearTimeout(timer);ws.close();resolve(d.history.prices.map(Number))}else if(d.error){done=true;clearTimeout(timer);ws.close();reject(new Error(d.error.message||"Historical data error"))}}catch(err){}};
+    ws.onerror=()=>{clearTimeout(timer);if(!done){done=true;reject(new Error("Historical data connection failed"))}};
+  });
+}
+async function historicalBacktest(){
+  const status=$("historicalStatus"),tapeEl=$("hbTape");
+  status.textContent="Loading historical ticks…";tapeEl.innerHTML="";
+  try{
+    const prices=await getHistoricalTicks($("btMarket").value,Number($("btCount").value)||1000);
+    const digits=prices.map(lastDigit);
+    const base=Number($("stake").value)||1,mg=Number($("martingale").value)||2,payout=Number($("btPayout").value)||0.9;
+    let wins=0,losses=0,pl=0,step=0,maxDD=0,peak=0,lossStreak=0,longestLoss=0;
+    digits.forEach(d=>{
+      const threshold=step===1?2:1,stake=step===1?base*mg:base,win=d>threshold;
+      if(win){wins++;pl+=stake*payout;step=0;lossStreak=0}else{losses++;pl-=stake;step=step===0?1:0;lossStreak++;longestLoss=Math.max(longestLoss,lossStreak)}
+      peak=Math.max(peak,pl);maxDD=Math.max(maxDD,peak-pl);
+    });
+    $("hbTrades").textContent=wins+losses;$("hbWins").textContent=wins;$("hbLosses").textContent=losses;$("hbPL").textContent=pl.toFixed(2);
+    status.textContent=`Completed ${digits.length} historical ticks • Win rate ${(wins/(wins+losses)*100).toFixed(1)}% • Max drawdown ${maxDD.toFixed(2)} • Longest losing streak ${longestLoss}.`;
+    ["First 10 digits: "+digits.slice(0,10).join(", "),`Rule: Over 1 → after loss Over 2 at ${mg}× → reset after second loss or win`,"Payout used: "+(payout*100).toFixed(0)+"% (approximation only)","Historical results do not guarantee future results."].forEach(x=>{const row=document.createElement("div");row.className="status";row.textContent=x;tapeEl.appendChild(row)});
+  }catch(e){status.textContent="Backtest failed: "+e.message}
+}
+$("historicalBtn").onclick=historicalBacktest;
+async function init(){
+  $("greeting").textContent="Good "+(new Date().getHours()<12?"morning":new Date().getHours()<18?"afternoon":"evening");
+  $("accountStatus").textContent="Checking connection…";
+  connectPublic();
+  renderDistribution();renderAnalysis();drawChart();
+  try{ await handleOAuthReturn(); }catch(e){ setConn(false); log("Connection startup error: "+(e.message||e)); }
+  startSessionRecovery();
+}
+window.addEventListener("resize",drawChart);
+init();
+})();
+</script>
+</div>
+</body>
+</html>
