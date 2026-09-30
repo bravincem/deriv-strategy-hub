@@ -435,93 +435,30 @@ if($("manualConnect"))$("manualConnect").onclick=()=>connectManualToken($("manua
 
 async function handleOAuthReturn(){
   const p=new URLSearchParams(window.location.search);
-  const returned=window.__DERIV_OAUTH_SESSION__ || p.get("session") || p.get("sid") || p.get("session_id") || "";
-  const workerConnected = p.has("deriv_connected") || p.has("connected") || p.has("oauth_success");
-  const saved=localStorage.getItem("deriv_strategy_session") || "";
-  const sessionId=returned || saved || p.get("token") || p.get("access_token") || "";
+  const connected=p.has("deriv_connected")||p.has("connected")||p.has("oauth_success");
+  const error=p.get("deriv_error");
   const diag=$("connectionDiag");
-  const showDiag=(msg,ok=false)=>{
-    if(!diag)return;
-    diag.style.display="block";
-    diag.className="notice "+(ok?"ok":"warn");
-    diag.textContent=msg;
-  };
-  const mask=(v)=>v?String(v).slice(0,8)+"…"+String(v).slice(-4):"none";
-
-  if(returned){
-    try{localStorage.setItem("deriv_strategy_session",returned);}catch(e){}
-    showDiag("STEP 1/4  OAuth session received: "+mask(returned));
-  }else if(saved){
-    showDiag("STEP 1/4  Saved Deriv session found: "+mask(saved));
-  }else if(workerConnected){
-    showDiag("STEP 1/4  Deriv login completed. Checking the authorized account…\nCallback parameters received.");
-    log("Deriv login completed. Checking your DEMO account…");
-  }else{
-    setConn(false);
-    showDiag("STEP 1/4  No Deriv session was received. Click Log In.");
-    log("Not connected. Click Log In to connect your DEMO account.");
-    return false;
+  const showDiag=(msg,ok=false)=>{if(!diag)return;diag.style.display="block";diag.className="notice "+(ok?"ok":"warn");diag.textContent=msg;};
+  if(error){setConn(false);showDiag("DERIV CONNECTION ERROR\\n"+error,false);log("Deriv connection failed: "+error);return false;}
+  if(!connected){setConn(false);showDiag("CONNECTION STATUS\\nClick CONNECT DERIV above to authorize your account.");return false;}
+  showDiag("STEP 1/3  Deriv authorization completed.\\nChecking your authorized accounts…");
+  try{
+    const r=await fetch(API_BASE+"/api/accounts",{method:"GET",credentials:"include",cache:"no-store"});
+    const raw=await r.text();let d;try{d=JSON.parse(raw)}catch{throw new Error("HTTP "+r.status+" — account service returned non-JSON");}
+    if(!r.ok||d.ok===false)throw new Error("HTTP "+r.status+" — "+(d.error||d.message||"account request rejected"));
+    const rawAccounts=Array.isArray(d.accounts)?d.accounts:(Array.isArray(d.data?.accounts)?d.data.accounts:(Array.isArray(d.data)?d.data:[]));
+    state.accounts=rawAccounts.map(a=>{const id=a.id||a.account_id||a.accountId||a.loginid;if(!id)return null;const currency=a.currency||a.account_currency||"USD";const balance=Number(a.balance??0);const demo=Boolean(a.is_demo??a.isDemo??a.demo??(typeof id==="string"&&/^(VRTC|VRT|VR|DOT)/i.test(id)));return{id,currency,balance:Number.isFinite(balance)?balance:0,is_demo:demo};}).filter(Boolean);
+    if(!state.accounts.length)throw new Error("No usable Deriv accounts were returned");
+    const demo=state.accounts.find(a=>a.is_demo),selected=demo||state.accounts[0];
+    state.account=selected;state.balance=selected.balance;renderAccountBalances();setConn(true);renderAccountBalances();
+    $("accountId").textContent=selected.id;$("balance").textContent=(selected.currency||"USD")+" "+Number(selected.balance||0).toFixed(2);
+    showDiag("STEP 3/3  DERIV CONNECTED ✓\\nAccounts returned: "+state.accounts.length+"\\nSelected: "+selected.id+"\\nBalance: "+(selected.currency||"USD")+" "+Number(selected.balance||0).toFixed(2),true);
+    log("Deriv account data connected.",true);
+    history.replaceState({},document.title,location.pathname+location.hash);
+    return true;
+  }catch(e){
+    setConn(false);showDiag("CONNECTION STOPPED\\n"+(e.message||String(e)),false);log("Connection failed: "+(e.message||String(e)));return false;
   }
-
-  state.sessionId=sessionId;
-  showDiag("STEP 2/4  Session saved. Contacting the Deriv account service…");
-  log("Deriv session received. Checking DEMO account…");
-
-  // The OAuth worker stores the real Deriv access token server-side.
-  // The browser must send the worker's session ID, not the OAuth access token.
-  const attempts=[
-    {name:"Worker session query",headers:{"Content-Type":"application/json"},url:API_BASE+"/api/accounts?session="+encodeURIComponent(sessionId||"")},
-    {name:"Worker X-Session-ID",headers:{"X-Session-ID":sessionId,"Content-Type":"application/json"},url:API_BASE+"/api/accounts"},
-    {name:"Worker session cookie",headers:{"Content-Type":"application/json"},url:API_BASE+"/api/accounts"}
-  ];
-
-  let lastError="No response";
-  let lastHttp="";
-  for(const attempt of attempts){
-    try{
-      showDiag("STEP 3/4  Trying account service…\nMethod: "+attempt.name);
-      const r=await fetch(attempt.url,{method:"GET",headers:attempt.headers,credentials:"include",cache:"no-store"});
-      const raw=await r.text();
-      lastHttp=String(r.status);
-      let d;
-      try{d=JSON.parse(raw)}catch{throw new Error("HTTP "+r.status+" — account service returned non-JSON");}
-      if(!r.ok || d.ok===false){
-        throw new Error("HTTP "+r.status+" — "+(d.error||d.message||"account request rejected"));
-      }
-      const rawAccounts=Array.isArray(d.accounts)?d.accounts:(Array.isArray(d.data?.accounts)?d.data.accounts:(Array.isArray(d.data)?d.data:[]));
-      state.accounts=rawAccounts.map(a=>{
-        const id=a.id||a.account_id||a.accountId||a.loginid;
-        if(!id)return null;
-        const currency=a.currency||a.account_currency||"USD";
-        const rawBalance=typeof a.balance==="object"&&a.balance!==null?a.balance.balance:a.balance;
-        const balance=Number(rawBalance);
-        const demo=Boolean(a.is_demo??a.isDemo??a.demo??(typeof id==="string"&&/^(VRTC|VRT|VR|DOT)/i.test(id)));
-        return {id,currency,balance:Number.isFinite(balance)?balance:0,is_demo:demo};
-      }).filter(Boolean);
-      if(!state.accounts.length)throw new Error("HTTP "+r.status+" — service returned 0 accounts");
-      const demo=state.accounts.find(a=>a.is_demo);
-      const selected=demo||state.accounts[0];
-      if(!selected)throw new Error("HTTP "+r.status+" — no usable account was returned");
-      state.account=selected;
-      state.balance=selected.balance;
-      renderAccountBalances();
-      state.sessionId=sessionId;
-      setConn(true);
-      renderAccountBalances();
-      $("accountId").textContent=selected.id;
-      $("balance").textContent=(selected.currency||"USD")+" "+Number(selected.balance||0).toFixed(2);
-      showDiag("STEP 4/4  DERIV CONNECTED ✓\nAccounts returned: "+state.accounts.length+"\nSelected: "+selected.id+"\nBalance: "+(selected.currency||"USD")+" "+Number(selected.balance||0).toFixed(2),true);
-      log("Deriv account data connected.",true);
-      if(location.search)history.replaceState({},document.title,location.pathname+location.hash);
-      return true;
-    }catch(e){
-      lastError=e.message||String(e);
-    }
-  }
-  setConn(false);
-  showDiag("CONNECTION STOPPED\nLast HTTP: "+(lastHttp||"none")+"\nReason: "+lastError+"\n\nThe Hub reached the OAuth callback, but the worker account session was not accepted.",false);
-  log("Connection failed: "+lastError);
-  return false;
 }
 
 let sessionRetryTimer=null;
