@@ -408,7 +408,7 @@ async function connectManualToken(token){
     },800);
   }
 }
-$("manualConnect").onclick=()=>connectManualToken($("manualToken").value.trim());
+if($("manualConnect"))$("manualConnect").onclick=()=>connectManualToken($("manualToken").value.trim());
 
 async function handleOAuthReturn(){
   const p=new URLSearchParams(window.location.search);
