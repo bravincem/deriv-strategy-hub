@@ -42,7 +42,7 @@ label{display:block;font-size:12px;color:#7f91a7;font-weight:800;margin-bottom:6
 <header class="top">
   <div class="brand"><div class="brandDot">●●●</div><span>DERIV STRATEGY HUB</span></div>
   <div class="spacer"></div>
-  <a class="btn" id="loginBtn" href="https://deriv-strategy-hub-api-bravincem.vercel.app/api/auth/start" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center">CONNECT DERIV</a>
+  <a class="btn" id="loginBtn" href="https://deriv-strategy-hub-one.vercel.app/api/auth/start" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center">CONNECT DERIV</a>
   <a class="btn secondary" id="tokenBtn" href="https://home.deriv.com/dashboard/login" target="_blank" rel="noopener" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center">OPEN DERIV</a>
 </header>
 
@@ -93,7 +93,7 @@ label{display:block;font-size:12px;color:#7f91a7;font-weight:800;margin-bottom:6
       <div class="metricBox"><small>Last Digit</small><b id="lastDigit">—</b></div>
     </div>
     <div class="notice ok" id="feedStatus">Public market data is live. Account balances require secure Deriv authorization.</div>
-    <a class="btn" id="connectAccountBtn" href="https://deriv-strategy-hub-api-bravincem.vercel.app/api/auth/start" style="display:inline-flex;text-decoration:none;margin-top:12px">CONNECT DERIV ACCOUNT ↗</a>
+    <a class="btn" id="connectAccountBtn" href="https://deriv-strategy-hub-one.vercel.app/api/auth/start" style="display:inline-flex;text-decoration:none;margin-top:12px">CONNECT DERIV ACCOUNT ↗</a>
   </div>
 </section>
 
@@ -220,7 +220,7 @@ label{display:block;font-size:12px;color:#7f91a7;font-weight:800;margin-bottom:6
 
 const PUBLIC_WS = "wss://api.derivws.com/trading/v1/options/ws/public";
 const OLD_WS = "wss://ws.binaryws.com/websockets/v3?app_id=1089";
-const API_BASE = "https://deriv-strategy-hub-api-bravincem.vercel.app";
+const API_BASE = "https://deriv-strategy-hub-one.vercel.app";
 
 const $ = id => document.getElementById(id);
 const state = {
@@ -337,7 +337,7 @@ function setMarket(s){
 $("market").addEventListener("change",e=>setMarket(e.target.value));
 $("qMarket").addEventListener("change",e=>setMarket(e.target.value));
 
-async function oauthLogin(){ location.href="https://deriv-strategy-hub-api-bravincem.vercel.app/api/auth/start"; }
+async function oauthLogin(){ location.href="https://deriv-strategy-hub-one.vercel.app/api/auth/start"; }
 $("loginBtn").onclick=oauthLogin;
 $("copyDemo").onclick=()=>window.open("https://home.deriv.com/dashboard/login","_blank","noopener");
 
