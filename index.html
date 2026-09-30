@@ -500,17 +500,18 @@ async function handleOAuthReturn(){
       }).filter(Boolean);
       if(!state.accounts.length)throw new Error("HTTP "+r.status+" — service returned 0 accounts");
       const demo=state.accounts.find(a=>a.is_demo);
-      if(!demo)throw new Error("HTTP "+r.status+" — accounts returned, but no DEMO account was identified");
-      state.account=demo;
-      state.balance=demo.balance;
+      const selected=demo||state.accounts[0];
+      if(!selected)throw new Error("HTTP "+r.status+" — no usable account was returned");
+      state.account=selected;
+      state.balance=selected.balance;
       renderAccountBalances();
       state.sessionId=sessionId;
       setConn(true);
       renderAccountBalances();
-      $("accountId").textContent=demo.id;
-      $("balance").textContent=(demo.currency||"USD")+" "+Number(demo.balance||0).toFixed(2);
-      showDiag("STEP 4/4  DEMO CONNECTED ✓\nAccount: "+demo.id+"\nBalance: "+(demo.currency||"USD")+" "+Number(demo.balance||0).toFixed(2),true);
-      log("DEMO account connected.",true);
+      $("accountId").textContent=selected.id;
+      $("balance").textContent=(selected.currency||"USD")+" "+Number(selected.balance||0).toFixed(2);
+      showDiag("STEP 4/4  DERIV CONNECTED ✓\nAccounts returned: "+state.accounts.length+"\nSelected: "+selected.id+"\nBalance: "+(selected.currency||"USD")+" "+Number(selected.balance||0).toFixed(2),true);
+      log("Deriv account data connected.",true);
       if(location.search)history.replaceState({},document.title,location.pathname+location.hash);
       return true;
     }catch(e){
