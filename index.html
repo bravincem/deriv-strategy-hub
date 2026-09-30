@@ -67,7 +67,7 @@ label{display:block;font-size:12px;color:#7f91a7;font-weight:800;margin-bottom:6
 <section id="dashboard" class="view active">
   <div class="hero"><h1 id="greeting">Good morning</h1><p>"The only limit to our realization of tomorrow will be our doubts of today."</p></div>
   <div class="sectionTitle"><h2>QUICK ACTIONS</h2><span class="pill" id="connPill">NOT CONNECTED</span></div>
-      <div id="connectionDiag" class="notice" style="margin:10px 0;display:none;white-space:pre-wrap;word-break:break-word"></div>
+      <div id="connectionDiag" class="notice warn" style="margin:10px 0;display:block;white-space:pre-wrap;word-break:break-word">CONNECTION STATUS\nNot connected yet. Click CONNECT DERIV above, complete the Deriv login, then return here.</div>
   <div class="grid">
     <div class="card"><div class="icon">♛</div><h3>Premium Bots</h3><p>Explore strategy templates and load them into the builder.</p><div class="link" data-go="free">Explore bots ↗</div></div>
     <div class="card"><div class="icon">⇧</div><h3>Upload Bot</h3><p>Load a local XML strategy file and inspect its contents.</p><div class="link" id="xmlBtn">Import XML ↗</div><input id="xmlFile" type="file" accept=".xml" hidden></div>
@@ -257,9 +257,9 @@ function renderAccountBalances(){
 }
 function setConn(on){
   state.connected=on;
-  const pill=$("connPill"); if(pill){pill.textContent=on?"DEMO CONNECTED":"NOT CONNECTED";pill.style.background=on?"#0f4b35":"#153354";}
-  const acct=$("accountStatus"); if(acct)acct.textContent=on ? (state.account?.id || "Connected") : "Not connected";
-  const copy=$("copyAccount"); if(copy)copy.textContent=on ? (state.account?.id || "Connected") : "Not connected";
+  const pill=$("connPill"); if(pill){pill.textContent=on?"DERIV CONNECTED":"NOT CONNECTED";pill.style.background=on?"#0f4b35":"#153354";}
+  const acct=$("accountStatus"); if(acct)acct.textContent=on ? "Demo + Real account data loaded" : "Not connected";
+  const copy=$("copyAccount"); if(copy)copy.textContent=on ? ("Demo + Real account data loaded" : "Not connected";
 }
 function symbolName(s){return ({"1HZ100V":"Volatility 100 (1s)","1HZ75V":"Volatility 75 (1s)","1HZ50V":"Volatility 50 (1s)","1HZ25V":"Volatility 25 (1s)"})[s]||s;}
 
