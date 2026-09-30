@@ -245,10 +245,9 @@ function log(msg,ok=false){
 }
 function setConn(on){
   state.connected=on;
-  $("connPill").textContent=on?"DEMO CONNECTED":"NOT CONNECTED";
-  $("connPill").style.background=on?"#0f4b35":"#153354";
-  $("accountStatus").textContent=on ? (state.account?.id || "Connected") : "Not connected";
-  $("copyAccount").textContent=on ? (state.account?.id || "Connected") : "Not connected";
+  const pill=$("connPill"); if(pill){pill.textContent=on?"DEMO CONNECTED":"NOT CONNECTED";pill.style.background=on?"#0f4b35":"#153354";}
+  const acct=$("accountStatus"); if(acct)acct.textContent=on ? (state.account?.id || "Connected") : "Not connected";
+  const copy=$("copyAccount"); if(copy)copy.textContent=on ? (state.account?.id || "Connected") : "Not connected";
 }
 function symbolName(s){return ({"1HZ100V":"Volatility 100 (1s)","1HZ75V":"Volatility 75 (1s)","1HZ50V":"Volatility 50 (1s)","1HZ25V":"Volatility 25 (1s)"})[s]||s;}
 
@@ -462,11 +461,11 @@ async function handleOAuthReturn(){
   log("Deriv session received. Checking DEMO account…");
 
   const attempts = workerConnected
-    ? [{
-        name: "OAuth worker session",
-        headers: {"Content-Type":"application/json"},
-        url: API_BASE+"/api/accounts?session="+encodeURIComponent(sessionId||"")
-      }]
+    ? [
+      {name:"OAuth worker query session",headers:{"Content-Type":"application/json"},url:API_BASE+"/api/accounts?session="+encodeURIComponent(sessionId||"")},
+      {name:"OAuth worker X-Session-ID",headers:{"X-Session-ID":sessionId,"Content-Type":"application/json"},url:API_BASE+"/api/accounts"},
+      {name:"OAuth worker cookie",headers:{"Content-Type":"application/json"},url:API_BASE+"/api/accounts"}
+    ]
     : [
       {name:"Bearer",headers:{"Authorization":"Bearer "+sessionId,"Content-Type":"application/json"},url:API_BASE+"/api/accounts"},
       {name:"X-Deriv-Session",headers:{"X-Deriv-Session":sessionId,"Content-Type":"application/json"},url:API_BASE+"/api/accounts"},
