@@ -1,0 +1,1 @@
+export default function handler(){return Response.json({ok:true,service:"deriv-strategy-hub-vercel-api",time:new Date().toISOString()})}
