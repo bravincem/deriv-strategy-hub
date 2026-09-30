@@ -691,7 +691,7 @@ async function historicalBacktest(){
   }catch(e){status.textContent="Backtest failed: "+e.message}
 }
 $("historicalBtn").onclick=historicalBacktest;
-async function init(){
+async async function init(){
   $("greeting").textContent="Good "+(new Date().getHours()<12?"morning":new Date().getHours()<18?"afternoon":"evening");
   $("connPill").textContent="NOT CONNECTED";
   $("accountStatus").textContent="Connect your Deriv account to load DEMO and REAL balances";
