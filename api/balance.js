@@ -1,0 +1,1 @@
+import handler from "./accounts.js"; export default handler;
