@@ -42,8 +42,8 @@ label{display:block;font-size:12px;color:#7f91a7;font-weight:800;margin-bottom:6
 <header class="top">
   <div class="brand"><div class="brandDot">●●●</div><span>DERIV STRATEGY HUB</span></div>
   <div class="spacer"></div>
-  <a class="btn" id="loginBtn" href="https://home.deriv.com/dashboard/login" target="_blank" rel="noopener" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center">OPEN DERIV</a>
-  <a class="btn secondary" id="tokenBtn" href="https://home.deriv.com/dashboard/login" target="_blank" rel="noopener" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center">DERIV TRADER</a>
+  <a class="btn" id="loginBtn" href="https://deriv-strategy-api.bravincem.workers.dev/auth/start" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center">CONNECT DERIV</a>
+  <a class="btn secondary" id="tokenBtn" href="https://home.deriv.com/dashboard/login" target="_blank" rel="noopener" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center">OPEN DERIV</a>
 </header>
 
 <nav class="nav" id="nav">
@@ -66,7 +66,7 @@ label{display:block;font-size:12px;color:#7f91a7;font-weight:800;margin-bottom:6
 
 <section id="dashboard" class="view active">
   <div class="hero"><h1 id="greeting">Good morning</h1><p>"The only limit to our realization of tomorrow will be our doubts of today."</p></div>
-  <div class="sectionTitle"><h2>QUICK ACTIONS</h2><span class="pill" id="connPill">DERIV DIRECT</span></div>
+  <div class="sectionTitle"><h2>QUICK ACTIONS</h2><span class="pill" id="connPill">NOT CONNECTED</span></div>
       <div id="connectionDiag" class="notice" style="margin:10px 0;display:none;white-space:pre-wrap;word-break:break-word"></div>
   <div class="grid">
     <div class="card"><div class="icon">♛</div><h3>Premium Bots</h3><p>Explore strategy templates and load them into the builder.</p><div class="link" data-go="free">Explore bots ↗</div></div>
@@ -75,14 +75,25 @@ label{display:block;font-size:12px;color:#7f91a7;font-weight:800;margin-bottom:6
     <div class="card"><div class="icon">⌘</div><h3>Quick Bot Builder</h3><p>Create a one-tick bot with stake, take-profit, stop-loss and recovery controls.</p><div class="link" data-go="quick">Create bot ↗</div></div>
   </div>
   <div class="darkPanel" style="margin-top:18px">
-    <div class="sectionTitle"><h2>DERIV DIRECT</h2><span class="status" id="accountStatus">Open Deriv in the official trading platform</span></div>
-    <div class="metric">
-      <div class="metricBox"><small>Account</small><b id="accountId">—</b></div>
-      <div class="metricBox"><small>Balance</small><b id="balance">—</b></div>
+    <div class="sectionTitle"><h2>DERIV ACCOUNTS</h2><span class="status" id="accountStatus">Connect your Deriv account to load balances</span></div>
+    <div class="grid2">
+      <div class="darkPanel" style="padding:16px">
+        <div class="status">DEMO BALANCE</div><div id="demoBalance" style="font-size:30px;font-weight:900;margin:8px 0">—</div>
+        <div class="status" id="demoAccountId">Demo account not connected</div>
+      </div>
+      <div class="darkPanel" style="padding:16px">
+        <div class="status">REAL BALANCE</div><div id="realBalance" style="font-size:30px;font-weight:900;margin:8px 0">—</div>
+        <div class="status" id="realAccountId">Real account not connected</div>
+      </div>
+    </div>
+    <div class="metric" style="margin-top:14px">
+      <div class="metricBox"><small>Selected account</small><b id="accountId">—</b></div>
+      <div class="metricBox"><small>Selected balance</small><b id="balance">—</b></div>
       <div class="metricBox"><small>Market</small><b id="marketName">Volatility 100</b></div>
       <div class="metricBox"><small>Last Digit</small><b id="lastDigit">—</b></div>
     </div>
-    <div class="notice ok" id="feedStatus">Live public market data is connected directly to Deriv. Account login is handled by Deriv itself.</div><a class="btn" href="https://home.deriv.com/dashboard/login" target="_blank" rel="noopener" style="display:inline-flex;text-decoration:none;margin-top:12px">OPEN DERIV ACCOUNT ↗</a>
+    <div class="notice ok" id="feedStatus">Public market data is live. Account balances require secure Deriv authorization.</div>
+    <a class="btn" id="connectAccountBtn" href="https://deriv-strategy-api.bravincem.workers.dev/auth/start" style="display:inline-flex;text-decoration:none;margin-top:12px">CONNECT DERIV ACCOUNT ↗</a>
   </div>
 </section>
 
@@ -232,6 +243,17 @@ function log(msg,ok=false){
   $("feedStatus").textContent=msg;
   $("feedStatus").className="notice "+(ok?"ok":"");
 }
+function renderAccountBalances(){
+  const accounts=Array.isArray(state.accounts)?state.accounts:[];
+  const demo=accounts.find(a=>a.is_demo||a.account_type==="demo"||/^(VRTC|VRT|VR|DOT)/i.test(String(a.id||a.account_id||"")));
+  const real=accounts.find(a=>!(a.is_demo||a.account_type==="demo") && !/^(VRTC|VRT|VR|DOT)/i.test(String(a.id||a.account_id||"")));
+  const fmt=a=>a?((a.currency||"USD")+" "+Number(a.balance||0).toFixed(2)):"—";
+  if($("demoBalance"))$("demoBalance").textContent=fmt(demo);
+  if($("realBalance"))$("realBalance").textContent=fmt(real);
+  if($("demoAccountId"))$("demoAccountId").textContent=demo?("Account: "+(demo.id||demo.account_id)):"Demo account not found";
+  if($("realAccountId"))$("realAccountId").textContent=real?("Account: "+(real.id||real.account_id)):"Real account not found";
+  if(demo){$("accountId").textContent=demo.id||demo.account_id||"—";$("balance").textContent=fmt(demo);}
+}
 function setConn(on){
   state.connected=on;
   const pill=$("connPill"); if(pill){pill.textContent=on?"DEMO CONNECTED":"NOT CONNECTED";pill.style.background=on?"#0f4b35":"#153354";}
@@ -314,7 +336,7 @@ function setMarket(s){
 $("market").addEventListener("change",e=>setMarket(e.target.value));
 $("qMarket").addEventListener("change",e=>setMarket(e.target.value));
 
-async function oauthLogin(){ window.open("https://home.deriv.com/dashboard/login","_blank","noopener"); }
+async function oauthLogin(){ location.href="https://deriv-strategy-api.bravincem.workers.dev/auth/start"; }
 $("loginBtn").onclick=oauthLogin;
 $("copyDemo").onclick=()=>window.open("https://home.deriv.com/dashboard/login","_blank","noopener");
 
@@ -480,8 +502,10 @@ async function handleOAuthReturn(){
       if(!demo)throw new Error("HTTP "+r.status+" — accounts returned, but no DEMO account was identified");
       state.account=demo;
       state.balance=demo.balance;
+      renderAccountBalances();
       state.sessionId=sessionId;
       setConn(true);
+      renderAccountBalances();
       $("accountId").textContent=demo.id;
       $("balance").textContent=(demo.currency||"USD")+" "+Number(demo.balance||0).toFixed(2);
       showDiag("STEP 4/4  DEMO CONNECTED ✓\nAccount: "+demo.id+"\nBalance: "+(demo.currency||"USD")+" "+Number(demo.balance||0).toFixed(2),true);
@@ -730,10 +754,11 @@ async function historicalBacktest(){
 $("historicalBtn").onclick=historicalBacktest;
 async function init(){
   $("greeting").textContent="Good "+(new Date().getHours()<12?"morning":new Date().getHours()<18?"afternoon":"evening");
-  $("connPill").textContent="DERIV DIRECT";
-  $("accountStatus").textContent="Open Deriv in the official trading platform";
-  $("feedStatus").textContent="Live public market data is connected directly to Deriv. Account login is handled by Deriv itself.";
+  $("connPill").textContent="NOT CONNECTED";
+  $("accountStatus").textContent="Connect your Deriv account to load DEMO and REAL balances";
+  $("feedStatus").textContent="Public market data is live. Account balances are loaded only after Deriv authorization.";
   try{ connectPublic(); }catch(e){ log("Public market feed error: "+(e.message||e)); }
+  try{ if(typeof handleOAuthReturn==="function") await handleOAuthReturn(); }catch(e){ log("Account connection error: "+(e.message||e)); }
   try{ renderDistribution(); }catch(e){}
   try{ renderAnalysis(); }catch(e){}
   try{ drawChart(); }catch(e){}
