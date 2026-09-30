@@ -328,7 +328,7 @@ $("qMarket").addEventListener("change",e=>setMarket(e.target.value));
 async function oauthLogin(){
   window.location.href=API_BASE+"/auth/start";
 }
-// The old hosted OAuth worker has been the failing part of this build.\n// Open the direct DEMO connection panel first so the user can connect without\n// depending on that worker. OAuth remains available as a fallback.\n$("loginBtn").onclick=showModal;
+// The old hosted OAuth worker has been the failing part of this build.\n// Open the direct DEMO connection panel first so the user can connect without\n// depending on that worker. OAuth remains available as a fallback.\n$("loginBtn").onclick=oauthLogin;
 $("copyDemo").onclick=showModal;
 
 function showModal(){ $("modal").classList.add("show"); }
